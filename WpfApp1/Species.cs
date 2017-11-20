@@ -8,6 +8,6 @@ namespace WpfApp1
 {
     public class Species
     {
-
+        public List<Unit> Units{ get; set; }
     }
 }

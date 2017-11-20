@@ -14,7 +14,7 @@ namespace WpfApp1
         {
             world = new List<Dictionary<int, Species>>();
         }
-
+        
         public void GetPopulation(int g, int s)
         {
             Species species = world[g][s];
