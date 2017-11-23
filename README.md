@@ -1,3 +1,4 @@
 # wpf
 Helpful links:<br>
-http://nn.cs.utexas.edu/?neat-c
+http://nn.cs.utexas.edu
+http://sharpneat.sourceforge.net/
