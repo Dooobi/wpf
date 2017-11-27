@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,8 @@ namespace NeuralNetwork
         Input,
         Hidden,
         Output,
-        Bias
+        Bias,
+        None
     }
 
     public class Neuron
@@ -33,18 +35,8 @@ namespace NeuralNetwork
             IncomingConnections = new List<Connection>();
             OutgoingConnections = new List<Connection>();
 
-            Output = 0;
-            NewOutput = 0;
-        }
-
-        public Neuron(string id) : this()
-        {
-            Id = id;
-        }
-
-        public Neuron(NeuronType type) : this()
-        {
-            Type = type;
+            Output = 0.0;
+            NewOutput = 0.0;
         }
 
         public Neuron(string id, NeuronType type) : this()
@@ -70,7 +62,18 @@ namespace NeuralNetwork
 
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(this, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.Objects });
+            return ToJson().ToString();
+        }
+
+        public JObject ToJson()
+        {
+            JObject json = new JObject();
+            json.Add("Id", Id);
+            json.Add("Type", Type.ToString());
+            json.Add("Output", Output);
+            json.Add("NewOutput", NewOutput);
+
+            return json;
         }
     }
 }

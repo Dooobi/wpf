@@ -6,6 +6,11 @@ namespace NeuralNetwork
 
     public class ActivationFunction
     {
+        public static double Passthrough(double input)
+        {
+            return input;
+        }
+
         public static double Sigmoid(double input)
         {
             return 2 / (1 + Math.Exp(-2 * input)) - 1;

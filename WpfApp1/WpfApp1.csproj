@@ -61,6 +61,7 @@
     </Compile>
     <Compile Include="Species.cs" />
     <Compile Include="Unit.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="World.cs" />
     <Page Include="Graph.xaml">
       <SubType>Designer</SubType>

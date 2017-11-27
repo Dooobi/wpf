@@ -25,21 +25,24 @@ namespace WpfApp1
         {
             InitializeComponent();
             Initialize();
-
-            //TestSerializeNeuron();
-
+            
             List<Neuron> neurons = GetNeurons();
 
             Network network = new Network(neurons, ActivationFunction.Tanh);
+            
+            Utils.WriteToFile(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_before.json", network.ToString(), false, false);
+
+            Network netFromFile = Network.FromFile(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_before.json");
+            Utils.WriteToFile(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_after.json", netFromFile.ToString(), false, false);
 
             List<double> inputs = new List<double>();
             inputs.Add(2.3);
             inputs.Add(-1.5);
             inputs.Add(-0.5);
 
-            network.Update(inputs);
+            netFromFile.Update(inputs);
 
-            Console.WriteLine(network.ToString());
+            //Utils.WriteToFile(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_after.json", netFromFile.ToString(), false, false);
         }
 
         private void Initialize()
@@ -74,24 +77,6 @@ namespace WpfApp1
             return new DrawingImage(geometryDrawing);
         }
 
-        private void TestSerializeNeuron()
-        {
-            Neuron neuron1 = new Neuron();
-            Neuron neuron2 = new Neuron();
-
-            neuron1.IncomingConnections = new List<Connection>();
-            Connection connection1 = new Connection();
-            connection1.Weight = 0.4;
-            connection1.NeuronFrom = neuron2;
-            connection1.NeuronTo = neuron1;
-
-            neuron1.IncomingConnections.Add(connection1);
-
-            string serializedNeuron = neuron1.ToString();
-
-            textBlock.Text = serializedNeuron;
-        }
-
         private List<Neuron> GetNeurons()
         {
             List<Neuron> neurons = new List<Neuron>();
@@ -110,67 +95,67 @@ namespace WpfApp1
 
             Neuron bias = new Neuron("bias", NeuronType.Bias);
 
-            Connection c1 = new Connection();
+            Connection c1 = new Connection("c1");
             c1.NeuronFrom = in1;
             c1.NeuronTo = h4;
             c1.Weight = 0.7;
 
-            Connection c2 = new Connection();
+            Connection c2 = new Connection("c2");
             c2.NeuronFrom = in1;
             c2.NeuronTo = h1;
             c2.Weight = 0.9;
 
-            Connection c3 = new Connection();
+            Connection c3 = new Connection("c3");
             c3.NeuronFrom = h1;
             c3.NeuronTo = h3;
             c3.Weight = -0.7;
 
-            Connection c4 = new Connection();
+            Connection c4 = new Connection("c4");
             c4.NeuronFrom = h3;
             c4.NeuronTo = h4;
             c4.Weight = 0.3;
 
-            Connection c5 = new Connection();
+            Connection c5 = new Connection("c5");
             c5.NeuronFrom = in3;
             c5.NeuronTo = out1;
             c5.Weight = -0.5;
 
-            Connection c6 = new Connection();
+            Connection c6 = new Connection("c6");
             c6.NeuronFrom = bias;
             c6.NeuronTo = h2;
             c6.Weight = 0.4;
 
-            Connection c7 = new Connection();
+            Connection c7 = new Connection("c7");
             c7.NeuronFrom = bias;
             c7.NeuronTo = h5;
             c7.Weight = -0.2;
 
-            Connection c8 = new Connection();
+            Connection c8 = new Connection("c8");
             c8.NeuronFrom = h5;
             c8.NeuronTo = h4;
             c8.Weight = -0.5;
 
-            Connection c9 = new Connection();
+            Connection c9 = new Connection("c9");
             c9.NeuronFrom = h5;
             c9.NeuronTo = out1;
             c9.Weight = 0.8;
 
-            Connection c10 = new Connection();
+            Connection c10 = new Connection("c10");
             c10.NeuronFrom = h4;
             c10.NeuronTo = out1;
             c10.Weight = 0.7;
 
-            Connection c11 = new Connection();
+            Connection c11 = new Connection("c11");
             c11.NeuronFrom = h2;
             c11.NeuronTo = h1;
             c11.Weight = -0.4;
 
-            Connection c12 = new Connection();
+            Connection c12 = new Connection("c12");
             c12.NeuronFrom = h3;
             c12.NeuronTo = h2;
             c12.Weight = 0.6;
 
-            Connection c13 = new Connection();
+            Connection c13 = new Connection("c13");
             c13.NeuronFrom = h4;
             c13.NeuronTo = h4;
             c13.Weight = 0.6;

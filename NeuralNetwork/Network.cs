@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -150,9 +153,128 @@ namespace NeuralNetwork
             return outputs;
         }
 
+        public List<Connection> GetAllConnections()
+        {
+            List<Connection> connections = new List<Connection>();
+
+            foreach (Neuron neuron in Neurons)
+            {
+                foreach (Connection connection in neuron.IncomingConnections)
+                {
+                    if (!connections.Contains(connection))
+                    {
+                        connections.Add(connection);
+                    }
+                }
+                foreach (Connection connection in neuron.OutgoingConnections)
+                {
+                    if (!connections.Contains(connection))
+                    {
+                        connections.Add(connection);
+                    }
+                }
+            }
+
+            return connections;
+        }
+
+        public static Network FromFile(string filepath)
+        {
+            string text = File.ReadAllText(filepath);
+            JObject json = JObject.Parse(text);
+
+            DelegateActivationFunction activationFunction = null;
+
+            List<Neuron> neurons = new List<Neuron>();
+            
+            foreach (MethodInfo method in typeof(ActivationFunction).GetMethods())
+            {
+                if (method.Name == (string)json.GetValue("ActivationFunction"))
+                {
+                    activationFunction = (DelegateActivationFunction)Delegate.CreateDelegate(typeof(DelegateActivationFunction), method);
+                }
+            }
+            
+            JArray jsonConnections = (JArray)json.GetValue("Connections");
+            JArray jsonNeurons = (JArray)json.GetValue("Neurons");
+
+            // Create list with neurons from JArray
+            foreach (JObject jsonNeuron in jsonNeurons)
+            {
+                NeuronType neuronType = NeuronType.None;
+                foreach (NeuronType type in Enum.GetValues(typeof(NeuronType)))
+                {
+                    if (type.ToString() == (string)jsonNeuron.GetValue("Type"))
+                    {
+                        neuronType = type;
+                    }
+                }
+                Neuron neuron = new Neuron((string)jsonNeuron.GetValue("Id"), neuronType);
+                neuron.Output = (double)jsonNeuron.GetValue("Output");
+                neuron.NewOutput = (double)jsonNeuron.GetValue("NewOutput");
+                neurons.Add(neuron);
+            }
+
+            // Create connections from JArray and connect them with neurons
+            foreach (JObject jsonConnection in jsonConnections)
+            {
+                Neuron neuronFrom = null;
+                Neuron neuronTo = null;
+                string neuronFromId = (string)jsonConnection.GetValue("NeuronFrom");
+                string neuronToId = (string)jsonConnection.GetValue("NeuronTo");
+
+                foreach (Neuron neuron in neurons)
+                {
+                    if (neuron.Id == neuronFromId)
+                    {
+                        neuronFrom = neuron;
+                    }
+                    if (neuron.Id == neuronToId)
+                    {
+                        neuronTo = neuron;
+                    }
+                }
+
+                Connection connection = new Connection((string)jsonConnection.GetValue("Id"), (double)jsonConnection.GetValue("Weight"), neuronFrom, neuronTo);
+                if (neuronFrom != null)
+                {
+                    neuronFrom.OutgoingConnections.Add(connection);
+                }
+                if (neuronTo != null)
+                {
+                    neuronTo.IncomingConnections.Add(connection);
+                }
+            }
+
+            return new Network(neurons, activationFunction);
+        }
+
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(this, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.Objects });
+            return ToJson().ToString();
+        }
+
+        public JObject ToJson()
+        {
+            JObject json = new JObject();
+
+            JArray neurons = new JArray();
+            foreach (Neuron neuron in Neurons)
+            {
+                neurons.Add(neuron.ToJson());
+            }
+
+            JArray connections = new JArray();
+            foreach (Connection connection in GetAllConnections())
+            {
+                connections.Add(connection.ToJson());
+            }
+
+            json.Add("Neurons", neurons);
+            json.Add("Connections", connections);
+            json.Add("ActivationFunction", ActivationFunction.Method.Name);
+
+            return json;
         }
     }
 }
