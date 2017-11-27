@@ -9,6 +9,13 @@ namespace WpfApp1
 {
     public static class Utils
     {
+        private static Random random = new Random();
+
+        public static double RandDouble(double inclusiveLowerBound, double exclusiveUpperBound)
+        {
+            return random.NextDouble() * (exclusiveUpperBound - inclusiveLowerBound) + inclusiveLowerBound;
+        }
+
         public static void WriteToFile(string filepath, string text, bool endWithNewLine, bool startWithNewLine)
         {
             if (endWithNewLine)
