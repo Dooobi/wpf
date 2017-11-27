@@ -1,0 +1,24 @@
+﻿{
+  "Generations": [
+    {
+      "Species": {
+        "1": {
+          "Population": [
+            {
+              "Fitness": "123",
+              "Network": {
+
+              }
+            },
+            {
+
+            }
+          ]
+        }
+      }
+    },
+    {
+
+    }
+  ]
+}
