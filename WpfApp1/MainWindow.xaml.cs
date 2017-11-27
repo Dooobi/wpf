@@ -30,10 +30,9 @@ namespace WpfApp1
 
             Network network = new Network(neurons, ActivationFunction.Tanh);
             
-            Utils.WriteToFile(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_before.json", network.ToString(), false, false);
+            Utils.WriteToFile(@"network_before_update.json", network.ToString(), false, false);
 
             Network netFromFile = Network.FromFile(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_before.json");
-            Utils.WriteToFile(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_after.json", netFromFile.ToString(), false, false);
 
             List<double> inputs = new List<double>();
             inputs.Add(2.3);
@@ -42,7 +41,7 @@ namespace WpfApp1
 
             netFromFile.Update(inputs);
 
-            //Utils.WriteToFile(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_after.json", netFromFile.ToString(), false, false);
+            Utils.WriteToFile(@"network_after_update.json", netFromFile.ToString(), false, false);
         }
 
         private void Initialize()
