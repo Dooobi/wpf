@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,37 @@ namespace Neat
             Weight = weight;
             NeuronGeneFrom = neuronGeneFrom;
             NeuronGeneTo = neuronGeneTo;
+        }
+
+        public override string ToString()
+        {
+            return ToJson().ToString();
+        }
+
+        public JObject ToJson()
+        {
+            JObject json = new JObject();
+            json.Add("Id", Id);
+            json.Add("Weight", Weight);
+            json.Add("InnovationNumber", InnovationNumber);
+            json.Add("IsEnabled", IsEnabled);
+            if (NeuronGeneFrom != null)
+            {
+                json.Add("NeuronGeneFrom", NeuronGeneFrom.Id);
+            }
+            else
+            {
+                json.Add("NeuronGeneFrom", "null");
+            }
+            if (NeuronGeneTo != null)
+            {
+                json.Add("NeuronGeneTo", NeuronGeneTo.Id);
+            }
+            else
+            {
+                json.Add("NeuronGeneTo", "null");
+            }
+            return json;
         }
     }
 }
