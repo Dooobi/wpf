@@ -178,11 +178,8 @@ namespace NeuralNetwork
             return connections;
         }
 
-        public static Network FromFile(string filepath)
+        public static Network FromJObject(JObject json)
         {
-            string text = File.ReadAllText(filepath);
-            JObject json = JObject.Parse(text);
-
             DelegateActivationFunction activationFunction = null;
 
             List<Neuron> neurons = new List<Neuron>();

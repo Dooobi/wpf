@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,11 @@ namespace WpfApp1
         public static double RandDouble(double inclusiveLowerBound, double exclusiveUpperBound)
         {
             return random.NextDouble() * (exclusiveUpperBound - inclusiveLowerBound) + inclusiveLowerBound;
+        }
+
+        public static JObject FileToJObject(string filepath)
+        {
+            return JObject.Parse(ReadFromFile(filepath));
         }
 
         public static void WriteToFile(string filepath, string text, bool endWithNewLine, bool startWithNewLine)

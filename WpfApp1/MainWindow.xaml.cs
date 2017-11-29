@@ -32,7 +32,7 @@ namespace WpfApp1
             
             Utils.WriteToFile(@"network_before_update.json", network.ToString(), false, false);
 
-            Network netFromFile = Network.FromFile(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_before.json");
+            Network netFromFile = Network.FromJObject(Utils.FileToJObject(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_before.json"));
 
             List<double> inputs = new List<double>();
             inputs.Add(2.3);

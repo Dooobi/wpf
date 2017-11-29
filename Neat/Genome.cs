@@ -76,18 +76,15 @@ namespace Neat
 
         }
 
-        public static Genome FromFile(string filepath)
+        public static Genome FromJObject(JObject json)
         {
-            string text = File.ReadAllText(filepath);
             Genome genome = new Genome();
-
-            JObject json = JObject.Parse(text);
-
+            
             List<NeuronGene> neuronGenes = new List<NeuronGene>();
             List<ConnectionGene> connectionGenes = new List<ConnectionGene>();
 
             JArray jsonNeuronGenes = (JArray)json.GetValue("NeuronGenes");
-            JArray jsonConnectionGenes = (JArray)json.GetValue("ConnectionGenes");            
+            JArray jsonConnectionGenes = (JArray)json.GetValue("ConnectionGenes");
 
             // Create list with neuronGenes from JArray
             foreach (JObject jsonNeuronGene in jsonNeuronGenes)
@@ -123,13 +120,13 @@ namespace Neat
                         neuronGeneTo = neuronGene;
                     }
                 }
-                
+
                 connectionGenes.Add(new ConnectionGene((string)jsonConnectionGene.GetValue("Id"), (int)jsonConnectionGene.GetValue("InnovationNumber"), (bool)jsonConnectionGene.GetValue("IsEnabled"), (double)jsonConnectionGene.GetValue("Weight"), neuronGeneFrom, neuronGeneTo));
             }
 
             return genome;
         }
-
+        
         public override string ToString()
         {
             return ToJson().ToString();
