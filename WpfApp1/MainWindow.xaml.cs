@@ -25,11 +25,38 @@ namespace WpfApp1
         {
             InitializeComponent();
             Initialize();
+
+            //TestNetwork();
+
+            TestGeneticAlgorithm();
+        }
+
+        private void Initialize()
+        {
+            World myWorld = new World();
             
+            myPanel.Children.Add(new Graph(GetGraph()));
+            myPanel.Children.Add(new Graph(GetGraph()));
+
+            Grid.SetRow(myPanel.Children[0], 1);
+            Grid.SetRow(myPanel.Children[0], 1);
+        }
+
+        private void TestGeneticAlgorithm()
+        {
+            // Connect to game
+
+            // Initialize NeatController
+            //  Create <pPopulationSize> basic Genomes
+            
+        }
+
+        private void TestNetwork()
+        {
             List<Neuron> neurons = GetNeurons();
 
             Network network = new Network(neurons, ActivationFunction.Tanh);
-            
+
             Utils.WriteToFile(@"network_before_update.json", network.ToString(), false, false);
 
             Network netFromFile = Network.FromJObject(Utils.FileToJObject(@"C:\Users\t.stelzer\dev\C#\Repos\wpf\NeuralNetwork\bin\Debug\network_before.json"));
@@ -42,17 +69,6 @@ namespace WpfApp1
             netFromFile.Update(inputs);
 
             Utils.WriteToFile(@"network_after_update.json", netFromFile.ToString(), false, false);
-        }
-
-        private void Initialize()
-        {
-            World myWorld = new World();
-            
-            myPanel.Children.Add(new Graph(GetGraph()));
-            myPanel.Children.Add(new Graph(GetGraph()));
-
-            Grid.SetRow(myPanel.Children[0], 1);
-            Grid.SetRow(myPanel.Children[0], 1);
         }
 
         private DrawingImage GetGraph()

@@ -16,6 +16,10 @@ namespace NeuralNetwork
             return 2 / (1 + Math.Exp(-2 * input)) - 1;
         }
 
+        public static double SigmoidModified(double input) {
+            return 1 / (1 + Math.Exp(-4.9 * input));
+        }
+
         public static double SigmoidDerivative(double input)
         {
             double s = Sigmoid(input);

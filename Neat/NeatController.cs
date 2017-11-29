@@ -9,6 +9,7 @@ namespace Neat
     public class NeatController
     {
         public List<Genome> Genomes { get; set; }
+
         private List<Generation> Generations;
         public int CurrentGeneration {
             get
@@ -23,6 +24,7 @@ namespace Neat
         {
             Generations = new List<Generation>();
             InnovationManager = new InnovationManager();
+            
         }
 
         public Species GetSpecies(int generationId, int speciesId)

@@ -70,7 +70,7 @@ namespace Neat
                     NeuronGene neuronGeneFrom = NeuronGenes[inputIndex];
                     NeuronGene neuronGeneTo = NeuronGenes[outputIndex + numberOfInputs + 1];
                     string connectionId = "c_" + neuronGeneFrom.Id + "_" + neuronGeneTo.Id;
-                    ConnectionGenes.Add(new ConnectionGene(connectionId, INNOVATION_NUMBER, true, Utils.RandDouble(-1.0, 1.0), neuronGeneFrom, neuronGeneTo);
+                    ConnectionGenes.Add(new ConnectionGene(connectionId, INNOVATION_NUMBER, true, Utils.RandDouble(-1.0, 1.0), neuronGeneFrom, neuronGeneTo));
                 }
             }
 
