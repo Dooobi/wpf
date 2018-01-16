@@ -62,7 +62,7 @@
     <Compile Include="Graph.xaml.cs">
       <DependentUpon>Graph.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Species.cs" />
+    <Compile Include="NeatGraph.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="World.cs" />
@@ -111,10 +111,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Neat\Neat.csproj">
+      <Project>{d748e370-698e-473d-b8d1-eeecbb6fb0ee}</Project>
+      <Name>Neat</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NeuralNetwork\NeuralNetwork.csproj">
       <Project>{c54e2838-3719-48c4-802a-b7cf5d3ede0a}</Project>
       <Name>NeuralNetwork</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -43,9 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="ConnectionGene.cs" />
     <Compile Include="Generation.cs" />
     <Compile Include="Genome.cs" />
+    <Compile Include="History.cs" />
     <Compile Include="Innovation.cs" />
     <Compile Include="InnovationManager.cs" />
     <Compile Include="NeatController.cs" />

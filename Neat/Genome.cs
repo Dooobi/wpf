@@ -13,6 +13,9 @@ namespace Neat
     {
         public string Id { get; set; }
 
+        public Generation Generation { get; set; }
+        public Species Species { get; set; }
+
         public List<NeuronGene> NeuronGenes { get; set; }
         public List<ConnectionGene> ConnectionGenes { get; set; }
 
@@ -69,11 +72,18 @@ namespace Neat
                     // And connect the input/bias NeuronGene with the output NeuronGene
                     NeuronGene neuronGeneFrom = NeuronGenes[inputIndex];
                     NeuronGene neuronGeneTo = NeuronGenes[outputIndex + numberOfInputs + 1];
-                    string connectionId = "c_" + neuronGeneFrom.Id + "_" + neuronGeneTo.Id;
-                    ConnectionGenes.Add(new ConnectionGene(connectionId, INNOVATION_NUMBER, true, Utils.RandDouble(-1.0, 1.0), neuronGeneFrom, neuronGeneTo));
+
+                    AddConnectionGene(neuronGeneFrom, neuronGeneTo);
                 }
             }
+        }
 
+        public void AddConnectionGene(NeuronGene neuronGeneFrom, NeuronGene neuronGeneTo)
+        {
+            string connectionId = "c_" + neuronGeneFrom.Id + "_" + neuronGeneTo.Id;
+            int innovationNumber = InnovationManager.Instance.GetInnovationNumber(neuronGeneFrom.Id, neuronGeneTo.Id);
+            ConnectionGene connectionGene = new ConnectionGene(connectionId, innovationNumber, true, Utils.RandDouble(-1.0, 1.0), neuronGeneFrom, neuronGeneTo);
+            ConnectionGenes.Add(connectionGene);
         }
 
         public static Genome FromJObject(JObject json)
@@ -149,6 +159,8 @@ namespace Neat
             }
 
             json.Add("Id", Id);
+            json.Add("Generation", Generation.Number);
+            json.Add("Species", Species.Number);
             json.Add("NeuronGenes", neuronGenes);
             json.Add("ConnectionGenes", connectionGenes);
             json.Add("NumberOfInputs", NumberOfInputs);

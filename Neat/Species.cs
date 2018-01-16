@@ -9,57 +9,54 @@ namespace Neat
 {
     public class Species
     {
-        public int Id { get; set; }
+        public int Number { get; set; }
 
+        //public Dictionary<Generation, List<Genome>> PopulationByGeneration { get; set; }
+        public List<Genome> Population { get; set; }
         public Genome LeaderGenome { get; set; }
-        public List<Genome> Genomes { get; set; }
-
-        public int OriginatedInGeneration { get; set; }
+        
         public int GenerationsNoImprovement { get; set; }
-        public int Age { get; set; }
 
         public double BestFitness { get; set; }
 
         private Species()
         {
-            Genomes = new List<Genome>();
-            Id = -1;
-            Age = 0;
-            OriginatedInGeneration = 0;
+            //PopulationByGeneration = new Dictionary<Generation, List<Genome>>();
+            Population = new List<Genome>();
+            Number = -1;
             GenerationsNoImprovement = 0;
         }
 
-        public Species(int id, int originatedInGeneration) : this()
+        public Species(int number) : this()
         {
-            Id = id;
-            OriginatedInGeneration = originatedInGeneration;
+            Number = number;
         }
+
+        //public void AddGenome(Genome genome)
+        //{
+        //    if (PopulationByGeneration[genome.Generation] == null)
+        //    {
+        //        PopulationByGeneration[genome.Generation] = new List<Genome>();
+        //    }
+        //    PopulationByGeneration[genome.Generation].Add(genome);
+        //}
 
         public static Species FromJObject(JObject json)
         {
             Species species = new Species();
 
             string leaderGenomeId = (string)json.GetValue("LeaderGenome");
-            JArray jarrayGenomes = (JArray)json.GetValue("Genomes");
-            
+
+            JArray jarrayGenomes = new JArray();
+
             // Build up list with genomes from JArray and assign LeaderGenome
             foreach (JObject jsonGenome in jarrayGenomes)
             {
-                Genome genome = Genome.FromJObject(jsonGenome);
 
-                species.Genomes.Add(genome);
-
-                // Check if this genome is the leader
-                if (genome.Id == leaderGenomeId)
-                {
-                    species.LeaderGenome = genome;
-                }
             }
 
-            species.Id = (int)json.GetValue("Id");
-            species.OriginatedInGeneration = (int)json.GetValue("OriginatedInGeneration");
+            species.Number = (int)json.GetValue("Number");
             species.GenerationsNoImprovement = (int)json.GetValue("GenerationsNoImprovement");
-            species.Age = (int)json.GetValue("Age");
 
             return species;
         }
@@ -73,18 +70,16 @@ namespace Neat
         {
             JObject json = new JObject();
 
-            JArray genomes = new JArray();
-            foreach (Genome genome in Genomes)
-            {
-                genomes.Add(genome.ToJson());
-            }
+            //JArray generations = new JArray();
+            //foreach (Generation generation in PopulationByGeneration.Keys)
+            //{
+            //    generations.Add(generation.Number);
+            //}
 
-            json.Add("Id", Id);
+            json.Add("Number", Number);
             json.Add("LeaderGenome", LeaderGenome.Id);
-            json.Add("Genomes", genomes);
-            json.Add("OriginatedInGeneration", OriginatedInGeneration);
+            json.Add("Generations", generations);
             json.Add("GenerationsNoImprovement", GenerationsNoImprovement);
-            json.Add("Age");
             json.Add("BestFitness", BestFitness);
             
             return json;

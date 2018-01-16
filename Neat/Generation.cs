@@ -9,32 +9,25 @@ namespace Neat
 {
     public class Generation
     {
-        public List<Genome> Population {
-            get
-            {
-                List<Genome> population = new List<Genome>();
-                foreach (Species species in Species.Values)
-                {
-                    population.AddRange(species.Genomes);
-                }
-                return population;
-            }
-        }
+        public int Number { get; set; }
 
-        public Dictionary<int, Species> Species { get; set; }
+        public Dictionary<Species, List<Genome>> PopulationBySpecies { get; set; }
 
         public double AverageFitness { get; set; }
         public double BestFitness { get; set; }
 
         public Generation()
         {
-            Species = new Dictionary<int, Species>();
+            PopulationBySpecies = new Dictionary<Species, List<Genome>>();
         }
 
-        public Species this[int speciesId]
+        public void AddGenome(Genome genome)
         {
-            get { return Species[speciesId]; }
-            set { Species[speciesId] = value; }
+            if (PopulationBySpecies[genome.Species] == null)
+            {
+                PopulationBySpecies[genome.Species] = new List<Genome>();
+            }
+            PopulationBySpecies[genome.Species].Add(genome);
         }
 
         public static Generation FromJObject(JObject json)
@@ -49,9 +42,7 @@ namespace Neat
             // Build up dictionary with species from JArray
             foreach (JObject jsonSpecies in jarraySpecies)
             {
-                Species species = Neat.Species.FromJObject(jsonSpecies);
 
-                generation.Species[species.Id] = species;
             }
 
             generation.AverageFitness = (double)json.GetValue("AverageFitness");
@@ -70,12 +61,12 @@ namespace Neat
             JObject json = new JObject();
 
             JArray jarraySpecies = new JArray();
-            foreach (Species species in Species.Values)
+            foreach (Species species in PopulationBySpecies.Keys)
             {
-                jarraySpecies.Add(species.ToJson());
+                jarraySpecies.Add(species.Number);
             }
 
-            json.Add("Species");
+            json.Add("Species", jarraySpecies);
             json.Add("AverageFitness", AverageFitness);
             json.Add("BestFitness", BestFitness);
 

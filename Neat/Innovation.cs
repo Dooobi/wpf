@@ -6,16 +6,10 @@ using System.Threading.Tasks;
 
 namespace Neat
 {
-    public enum InnovationType
-    {
-        NewNeuronGene,
-        NewConnectionGene
-    }
-
     public class Innovation
     {
-        public int Id { get; set; }
-        public InnovationType Type { get; set; }
-
+        public int InnovationNumber { get; set; }
+        public string NeuronGeneFromId { get; set; }
+        public string NeuronGeneToId { get; set; }
     }
 }

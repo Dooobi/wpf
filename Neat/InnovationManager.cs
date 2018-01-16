@@ -8,11 +8,13 @@ namespace Neat
 {
     public class InnovationManager
     {
+        public static InnovationManager Instance = new InnovationManager();
+
         public int NextInnovationNumber { get; set; }
 
         public List<Innovation> Innovations { get; set; }
 
-        private InnovationManager()
+        public InnovationManager()
         {
             Innovations = new List<Innovation>();
             NextInnovationNumber = 0;
@@ -24,19 +26,27 @@ namespace Neat
             foreach (NeuronGene neuronGene in startNeuronGenes)
             {
                 Innovations.Add(new Innovation());
-                //SInnovation(start_neurons[nd], m_NextInnovationNum++, m_NextNeuronID++);
             }
 
             // Add the ConnectionGenes
             foreach (ConnectionGene connectionGene in startConnectionGenes)
             {
-                //SInnovation NewInnov(start_genes[cGen].FromNeuron,
-                //                 start_genes[cGen].ToNeuron,
-                //                 new_link,
-                //                 m_NextInnovationNum++);
-
                 Innovations.Add(new Innovation());
             }
+        }
+
+        public int GetInnovationNumber(string neuronGeneFromId, string neuronGeneToId) {
+
+            foreach (Innovation innovation in Innovations)
+            {
+                if (innovation.NeuronGeneFromId == neuronGeneFromId
+                    && innovation.NeuronGeneToId == neuronGeneToId)
+                {
+                    return innovation.InnovationNumber;
+                }
+            }
+
+            return NextInnovationNumber++;
         }
     }
 }
