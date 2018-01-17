@@ -11,6 +11,20 @@ namespace Neat
     {
         public int Number { get; set; }
 
+        public List<Genome> Population
+        {
+            get
+            {
+                List<Genome> population = new List<Genome>();
+
+                foreach (List<Genome> populationBySpecies in PopulationBySpecies.Values)
+                {
+                    population.AddRange(populationBySpecies);
+                }
+
+                return population;
+            }
+        }
         public Dictionary<Species, List<Genome>> PopulationBySpecies { get; set; }
 
         public double AverageFitness { get; set; }
@@ -19,6 +33,11 @@ namespace Neat
         public Generation()
         {
             PopulationBySpecies = new Dictionary<Species, List<Genome>>();
+        }
+
+        public Generation(int number) : this()
+        {
+            Number = number;
         }
 
         public void AddGenome(Genome genome)

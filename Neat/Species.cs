@@ -9,37 +9,26 @@ namespace Neat
 {
     public class Species
     {
-        public int Number { get; set; }
+        public string Id{ get; set; }
 
-        //public Dictionary<Generation, List<Genome>> PopulationByGeneration { get; set; }
         public List<Genome> Population { get; set; }
-        public Genome LeaderGenome { get; set; }
-        
+        public Dictionary<Generation, SpeciesTimestamp> SpeciesTimestamps { get; set; }
+
         public int GenerationsNoImprovement { get; set; }
 
         public double BestFitness { get; set; }
 
         private Species()
         {
-            //PopulationByGeneration = new Dictionary<Generation, List<Genome>>();
             Population = new List<Genome>();
-            Number = -1;
+            Id = "undefined";
             GenerationsNoImprovement = 0;
         }
 
-        public Species(int number) : this()
+        public Species(string id) : this()
         {
-            Number = number;
+            Id = id;
         }
-
-        //public void AddGenome(Genome genome)
-        //{
-        //    if (PopulationByGeneration[genome.Generation] == null)
-        //    {
-        //        PopulationByGeneration[genome.Generation] = new List<Genome>();
-        //    }
-        //    PopulationByGeneration[genome.Generation].Add(genome);
-        //}
 
         public static Species FromJObject(JObject json)
         {
@@ -55,7 +44,7 @@ namespace Neat
 
             }
 
-            species.Number = (int)json.GetValue("Number");
+            species.Id = (string)json.GetValue("Id");
             species.GenerationsNoImprovement = (int)json.GetValue("GenerationsNoImprovement");
 
             return species;
@@ -76,9 +65,7 @@ namespace Neat
             //    generations.Add(generation.Number);
             //}
 
-            json.Add("Number", Number);
-            json.Add("LeaderGenome", LeaderGenome.Id);
-            json.Add("Generations", generations);
+            json.Add("Id", Id);
             json.Add("GenerationsNoImprovement", GenerationsNoImprovement);
             json.Add("BestFitness", BestFitness);
             

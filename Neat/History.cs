@@ -19,12 +19,27 @@ namespace Neat
             Speciess = new Dictionary<Generation, List<Species>>();
         }
 
-        public static Generation LastGeneration
+        public static Generation PreviousGeneration
         {
             get
             {
-                Generations.Sort((generation1, generation2) => generation1.Number.CompareTo(generation2.Number));
-                return Generations[Generations.Count - 1];
+                if (Generations.Count >= 2)
+                {
+                    return Generations[Generations.Count - 2];
+                }
+                return null;                
+            }
+        }
+
+        public static Generation CurrentGeneration
+        {
+            get
+            {
+                if (Generations.Count >= 1)
+                {
+                    return Generations[Generations.Count - 1];
+                }
+                return null;
             }
         }
 
