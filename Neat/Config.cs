@@ -15,5 +15,7 @@ namespace Neat
         public static double compatibilityCoefficientNumExcessGenes = 1.0;
         public static double compatibilityCoefficientNumDisjointGenes = 1.0;
         public static double compatibilityCoefficientAvgWeightDifference = 0.4;
+        public static double numGenomesFromElitismRatio = 0.2;
+        public static double numOffspringFromMutationRatio = 0.25;
     }
 }
