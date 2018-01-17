@@ -78,10 +78,46 @@ namespace Neat
 
         private double CalculateCompatibility(Genome genome1, Genome genome2)
         {
-            double numGenesLargerGenome, numExcessGenes, numDisjointGenes, avgWeightDifference;
-            double coefficient1, coefficient2, coefficient3;
+            int numGenesLargerGenome, numExcessGenes = 0, numDisjointGenes = 0, numMatchingGenes = 0;
+            double sumWeightDifference = 0.0, avgWeightDifference;
+            
+            Dictionary<int, ConnectionGene> genesByInnovationNumber1 = genome1.GetConnectionGenesByInnovationNumber();
+            Dictionary<int, ConnectionGene> genesByInnovationNumber2 = genome1.GetConnectionGenesByInnovationNumber();
+            int smallerMaxInnovationNumber = Math.Min(genesByInnovationNumber1.Keys.Max(), genesByInnovationNumber2.Keys.Max());
+            int higherMaxInnovationNumber = Math.Max(genesByInnovationNumber1.Keys.Max(), genesByInnovationNumber2.Keys.Max());
 
-            return (coefficient1 * numExcessGenes) / numGenesLargerGenome + (coefficient2 * numDisjointGenes) / numGenesLargerGenome + coefficient3 * avgWeightDifference;
+            for (int i = 1; i <= higherMaxInnovationNumber; i++)
+            {
+                ConnectionGene gene1 = genesByInnovationNumber1[i];
+                ConnectionGene gene2 = genesByInnovationNumber2[i];
+
+                if (gene1 != null && gene2 == null
+                    || gene1 == null && gene2 != null)
+                {
+                    // The connectionGene is either disjoint or excess
+                    if (i > smallerMaxInnovationNumber)
+                    {
+                        // It's excess
+                        numExcessGenes++;
+                    }
+                    else
+                    {
+                        // It's disjoint
+                        numDisjointGenes++;
+                    }
+                }
+                else if (gene1 != null && gene2 != null)
+                {
+                    // The connectionGenes are matching
+                    numMatchingGenes++;
+                    sumWeightDifference += Math.Abs(gene1.Weight - gene2.Weight);
+                }
+            }
+
+            numGenesLargerGenome = Math.Max(genome1.ConnectionGenes.Count, genome2.ConnectionGenes.Count);
+            avgWeightDifference = sumWeightDifference / numMatchingGenes;
+
+            return (Config.compatibilityCoefficientNumExcessGenes * numExcessGenes) / numGenesLargerGenome + (Config.compatibilityCoefficientNumDisjointGenes * numDisjointGenes) / numGenesLargerGenome + Config.compatibilityCoefficientAvgWeightDifference * avgWeightDifference;
         }
     }
 }

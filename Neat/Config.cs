@@ -12,5 +12,8 @@ namespace Neat
         public static int numberOfInputs = 2;
         public static int numberOfOutputs = 3;
         public static double compatibilityThreshold = 3.0;
+        public static double compatibilityCoefficientNumExcessGenes = 1.0;
+        public static double compatibilityCoefficientNumDisjointGenes = 1.0;
+        public static double compatibilityCoefficientAvgWeightDifference = 0.4;
     }
 }

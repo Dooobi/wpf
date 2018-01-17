@@ -78,6 +78,19 @@ namespace Neat
             }
         }
 
+        public Dictionary<int, ConnectionGene> GetConnectionGenesByInnovationNumber()
+        {
+            Dictionary<int, ConnectionGene> connectionGenesByInnovationNumber = new Dictionary<int, ConnectionGene>();
+
+            foreach (ConnectionGene connectionGene in ConnectionGenes)
+            {
+                int innovationNumber = connectionGene.InnovationNumber;
+                connectionGenesByInnovationNumber[innovationNumber] = connectionGene;
+            }
+
+            return connectionGenesByInnovationNumber;
+        }
+
         public void AddConnectionGene(NeuronGene neuronGeneFrom, NeuronGene neuronGeneTo)
         {
             string connectionId = "c_" + neuronGeneFrom.Id + "_" + neuronGeneTo.Id;
