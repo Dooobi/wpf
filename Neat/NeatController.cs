@@ -73,9 +73,9 @@ namespace Neat
         {
             foreach (Species species in History.Speciess[History.CurrentGeneration])
             {
-                foreach (Genome genome in species.PopulationByGeneration[History.CurrentGeneration])
+                foreach (Genome genome in species.SpeciesTimestamps[History.CurrentGeneration].Members)
                 {
-                    double adjustedFitness = genome.Fitness / species.PopulationByGeneration[History.CurrentGeneration].Count;
+                    double adjustedFitness = genome.Fitness / species.SpeciesTimestamps[History.CurrentGeneration].Members.Count;
                     genome.AdjustedFitness = adjustedFitness;
                 }
             }

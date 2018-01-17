@@ -9,7 +9,7 @@ namespace Neat
 {
     public class Species
     {
-        public string Id{ get; set; }
+        public string Id { get; set; }
 
         public List<Genome> Population { get; set; }
         public Dictionary<Generation, SpeciesTimestamp> SpeciesTimestamps { get; set; }

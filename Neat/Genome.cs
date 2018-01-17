@@ -173,7 +173,7 @@ namespace Neat
 
             json.Add("Id", Id);
             json.Add("Generation", Generation.Number);
-            json.Add("Species", Species.Number);
+            json.Add("Species", Species.Id);
             json.Add("NeuronGenes", neuronGenes);
             json.Add("ConnectionGenes", connectionGenes);
             json.Add("NumberOfInputs", NumberOfInputs);

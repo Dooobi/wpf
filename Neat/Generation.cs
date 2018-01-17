@@ -82,7 +82,7 @@ namespace Neat
             JArray jarraySpecies = new JArray();
             foreach (Species species in PopulationBySpecies.Keys)
             {
-                jarraySpecies.Add(species.Number);
+                jarraySpecies.Add(species.Id);
             }
 
             json.Add("Species", jarraySpecies);
