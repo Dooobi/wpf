@@ -11,7 +11,9 @@ namespace Neat
         public Species Species { get; set; }
         public Genome Leader { get; set; }
         public List<Genome> Members { get; set; }
-        public int AmountToBreed { get; set; }
+        public int AmountToGenerateForNextGeneration { get; set; }
+        public int AmountToGenerateByElitism { get; set; }
+        public int AmountToGenerateByCrossover { get; set; }
 
         public SpeciesTimestamp(Species species)
         {

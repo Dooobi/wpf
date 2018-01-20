@@ -20,6 +20,15 @@ namespace Neat
             Type = type;
         }
 
+        /*
+         * This constructor creates a copy of a NeuronGene
+         */
+        public NeuronGene(NeuronGene neuronGene)
+        {
+            Id = neuronGene.Id;
+            Type = neuronGene.Type;
+        }
+
         public override string ToString()
         {
             return ToJson().ToString();

@@ -23,10 +23,67 @@ namespace NeuralNetwork
 
         private Network()
         {
+            Neurons = new List<Neuron>();
             InputNeurons = new List<Neuron>();
             HiddenNeurons = new List<Neuron>();
             OutputNeurons = new List<Neuron>();
             BiasNeurons = new List<Neuron>();
+        }
+
+        /*
+         * This constructor creates a copy of a Network
+         */
+        public Network(Network network)
+        {
+            List<Connection> copiedConnections = new List<Connection>();
+
+            // Copy every Connection
+            // IMPORTANT: 
+            //  Their NeuronFrom and NeuronTo properties set to the original Neurons
+            //  They will be replaced by the copies later
+            foreach (Connection connection in network.GetAllConnections())
+            {
+                if (!copiedConnections.Contains(connection))
+                {
+                    copiedConnections.Add(new Connection(connection));
+                }
+            }
+
+            // Now create copies of every Neuron and pass them the copiedConnections
+            // so they can use them to connect themselves
+            foreach (Neuron inputNeuron in network.InputNeurons)
+            {
+                Neuron copiedNeuron = new Neuron(inputNeuron, copiedConnections);
+                InputNeurons.Add(copiedNeuron);
+                Neurons.Add(copiedNeuron);
+            }
+            foreach (Neuron hiddenNeuron in network.HiddenNeurons)
+            {
+                Neuron copiedNeuron = new Neuron(hiddenNeuron, copiedConnections);
+                HiddenNeurons.Add(copiedNeuron);
+                Neurons.Add(copiedNeuron);
+            }
+            foreach (Neuron outputNeuron in network.OutputNeurons)
+            {
+                Neuron copiedNeuron = new Neuron(outputNeuron, copiedConnections);
+                OutputNeurons.Add(copiedNeuron);
+                Neurons.Add(copiedNeuron);
+            }
+            foreach (Neuron biasNeuron in network.BiasNeurons)
+            {
+                Neuron copiedNeuron = new Neuron(biasNeuron, copiedConnections);
+                BiasNeurons.Add(copiedNeuron);
+                Neurons.Add(copiedNeuron);
+            }
+
+            // Now that the copies of the Neurons are created the
+            // NeuronFrom and NeuronTo properties of the Connections will be 
+            // replaced with the corresponding copies of the Neurons
+            foreach (Connection connection in copiedConnections)
+            {
+                connection.NeuronFrom = Neurons.Find(neuron => neuron.Id == connection.NeuronFrom.Id);
+                connection.NeuronTo = Neurons.Find(neuron => neuron.Id == connection.NeuronTo.Id);
+            }
         }
 
         public Network(List<Neuron> neurons, DelegateActivationFunction activationFunction) : this()

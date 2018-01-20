@@ -28,6 +28,22 @@ namespace Neat
             NeuronGeneTo = neuronGeneTo;
         }
 
+        /*
+         * This constructor creates a copy of a ConnectionGene
+         * It needs a list of copied NeuronGenes to set the
+         *  NeuronGeneFrom and NeuronGeneTo properties
+         * to a copy of the original NeuronGenes
+         */
+        public ConnectionGene(ConnectionGene connectionGene, List<NeuronGene> copiedNeuronGenes)
+        {
+            Id = connectionGene.Id;
+            NeuronGeneFrom = copiedNeuronGenes.Find(neuronGene => neuronGene.Id == connectionGene.NeuronGeneFrom.Id);
+            NeuronGeneTo = copiedNeuronGenes.Find(neuronGene => neuronGene.Id == connectionGene.NeuronGeneTo.Id);
+            Weight = connectionGene.Weight;
+            InnovationNumber = connectionGene.InnovationNumber;
+            IsEnabled = connectionGene.IsEnabled;
+        }
+
         public override string ToString()
         {
             return ToJson().ToString();

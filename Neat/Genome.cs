@@ -34,6 +34,27 @@ namespace Neat
         }
 
         /**
+         * This constructor creates a copy of a genome
+         */
+        public Genome(Genome genome) : this()
+        {
+            Id = genome.Id;
+            foreach (NeuronGene neuronGene in genome.NeuronGenes)
+            {
+                NeuronGenes.Add(new NeuronGene(neuronGene));
+            }
+            foreach (ConnectionGene connectionGene in genome.ConnectionGenes)
+            {
+                ConnectionGenes.Add(new ConnectionGene(connectionGene, NeuronGenes));
+            }
+            Network = new Network(genome.Network);
+            Fitness = genome.Fitness;
+            AdjustedFitness = genome.AdjustedFitness;
+            NumberOfInputs = genome.NumberOfInputs;
+            NumberOfOutputs = genome.NumberOfOutputs;
+        }
+
+        /**
          * This constructors create a basic genome with:
          *   Input NeuronGenes depending on numberOfInputs,
          *   Output NeuronGenes depending on numberOfOutputs and

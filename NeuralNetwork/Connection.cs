@@ -23,6 +23,18 @@ namespace NeuralNetwork
             Weight = 0.0;
         }
 
+        /*
+         * This constructor creates a copy of a Connection
+         * IMPORTANT: The NeuronFrom and NeuronTo properties are set to the original Neurons
+         */
+        public Connection(Connection connection)
+        {
+            Id = connection.Id;
+            Weight = connection.Weight;
+            NeuronFrom = connection.NeuronFrom;
+            NeuronTo = connection.NeuronTo;
+        }
+
         public Connection(string id, double weight) : this(id)
         {
             Weight = weight;

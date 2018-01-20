@@ -15,7 +15,10 @@ namespace Neat
         public static double compatibilityCoefficientNumExcessGenes = 1.0;
         public static double compatibilityCoefficientNumDisjointGenes = 1.0;
         public static double compatibilityCoefficientAvgWeightDifference = 0.4;
-        public static double numGenomesFromElitismRatio = 0.2;
-        public static double numOffspringFromMutationRatio = 0.25;
+        public static double genomesFromElitismRatio = 0.2;
+        public static double offspringFromMutationRatio = 0.25;
+        public static double maxChanceForSelectionToCrossover = 0.4;
+        public static double minChanceForSelectionToCrossover = 0.05;
+        public static double chanceForInterspeciesCrossover = 0.0; // not yet supported
     }
 }

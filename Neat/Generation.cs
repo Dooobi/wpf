@@ -35,6 +35,13 @@ namespace Neat
             PopulationBySpecies = new Dictionary<Species, List<Genome>>();
         }
 
+        public Generation(Generation generation) : this()
+        {
+            Number = generation.Number;
+            AverageFitness = generation.AverageFitness;
+            BestFitness = generation.BestFitness;
+        }
+
         public Generation(int number) : this()
         {
             Number = number;

@@ -39,6 +39,28 @@ namespace NeuralNetwork
             NewOutput = 0.0;
         }
 
+        /*
+         * This constructor creates a copy of a Neuron
+         * It needs a list of copied Connections to fill the
+         *  IncomingConnections and OutgoingConnections lists
+         * with copies of the original Connections
+         */
+        public Neuron(Neuron neuron, List<Connection> copiedConnections) : this()
+        {
+            Id = neuron.Id;
+            Type = neuron.Type;
+            //Output = neuron.Output;
+            //NewOutput = neuron.NewOutput;
+            foreach (Connection incomingConnection in neuron.IncomingConnections)
+            {
+                IncomingConnections.Add(copiedConnections.Find(connection => connection.Id == incomingConnection.Id));
+            }
+            foreach (Connection outgoingConnection in neuron.OutgoingConnections)
+            {
+                OutgoingConnections.Add(copiedConnections.Find(connection => connection.Id == outgoingConnection.Id));
+            }
+        }
+
         public Neuron(string id, NeuronType type) : this()
         {
             Id = id;
