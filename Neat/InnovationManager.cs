@@ -17,7 +17,7 @@ namespace Neat
         public InnovationManager()
         {
             Innovations = new List<Innovation>();
-            NextInnovationNumber = 0;
+            NextInnovationNumber = 1;
         }
 
         public InnovationManager(List<NeuronGene> startNeuronGenes, List<ConnectionGene> startConnectionGenes) : this()

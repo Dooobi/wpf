@@ -15,25 +15,26 @@ namespace Neat
             Generation newGeneration = new Generation(History.CurrentGeneration.Number + 1);
             History.Generations.Add(newGeneration);
 
-            Speciate(populationOfCurrentGeneration);
-            AdjustFitness();
-            DetermineAmountToGenerateForEachSpecies();
-
             foreach (Genome genome in populationOfCurrentGeneration)
             {
+                genome.Generation = History.CurrentGeneration;
                 History.CurrentGeneration.AddGenome(genome);
             }
 
-            List<Genome> elitists = PerformElitism();
+            Speciate(populationOfCurrentGeneration);
+            AdjustFitness();
+            DetermineAmountToGenerateForEachSpecies();
+            
+            // Add the elitists to the population for the next Generation
+            PerformElitism(ref populationForNextGeneration);
 
-            // Crossover (AmountToGeneratByCrossover)
-            // The chance for getting selected to reproduce linearly increases
-            // the better the fitness of a Genome is, relative to the fitness of the other Genomes in the same Species
-            List<Genome> offspring = PerformCrossover();
+            // Crossover
+            // The chance for getting selected for crossover linearly increases the
+            // better the fitness of a Genome is
+            PerformCrossover(ref populationForNextGeneration);
 
             // Mutation (Applied to every genome but only with a certain percentage)
-
-            populationForNextGeneration.AddRange(elitists);
+            
             // Determine species
             // Save to file
             // Render
@@ -51,18 +52,28 @@ namespace Neat
         //  a compatibility score with every other member of the population and 
         //  niching accordingly.
         //------------------------------------------------------------------------
+        // History.CurrentGeneration is the Generation of the evaluated Population
         private void Speciate(List<Genome> evaluatedPopulation)
         {
+            List<Species> availableSpeciesForThisGeneration = new List<Species>(History.Speciess[History.PreviousGeneration]);
+
             foreach (Genome genome in evaluatedPopulation)
-            {
-                List<Species> availableSpeciesForThisGeneration = new List<Species>(History.Speciess[History.PreviousGeneration]);
+            {                
                 availableSpeciesForThisGeneration.AddRange(History.Speciess[History.CurrentGeneration]);
 
                 foreach (Species species in availableSpeciesForThisGeneration)
                 {
-                    Genome leaderGenome = species.SpeciesTimestamps[History.PreviousGeneration].Leader;
-                    if (leaderGenome == null)
+                    Genome leaderGenome;
+                    if (species.SpeciesTimestamps[History.PreviousGeneration] != null)
                     {
+                        // Take the leader of this Species from the previous Generation
+                        leaderGenome = species.SpeciesTimestamps[History.PreviousGeneration].Leader;
+                    }
+                    else
+                    {
+                        // If the Species was created during this Epoch there won't be a
+                        // leader of this Species for last Generation.
+                        // So take the leader of this Generation instead
                         leaderGenome = species.SpeciesTimestamps[History.CurrentGeneration].Leader;
                     }
 
@@ -71,7 +82,12 @@ namespace Neat
                     if (compatibility <= Config.compatibilityThreshold)
                     {
                         genome.Species = species;
-                        species.Population.Add(genome);
+                        species.AddGenomeAndUpdateSpecies(genome);
+
+                        if (!History.Speciess[History.CurrentGeneration].Contains(species))
+                        {
+                            History.Speciess[History.CurrentGeneration].Add(species);
+                        }
                     }
                 }
 
@@ -81,8 +97,9 @@ namespace Neat
                 SpeciesTimestamp speciesTimestamp = new SpeciesTimestamp(newSpecies);
                 newSpecies.SpeciesTimestamps[History.CurrentGeneration] = speciesTimestamp;
                 speciesTimestamp.Leader = genome;
-                newSpecies.Population.Add(genome);
-                newSpecies.BestFitness = genome.Fitness;
+
+                // Adds genome to Species and SpeciesTimestamp and update BestFitness of Species
+                newSpecies.AddGenomeAndUpdateSpecies(genome); 
                 genome.Species = newSpecies;
                 History.Speciess[History.CurrentGeneration].Add(newSpecies);
             }
@@ -94,7 +111,8 @@ namespace Neat
             }
         }
 
-        public List<Genome> PerformElitism()
+        // History.CurrentGeneration is the Generation of the evaluated Population
+        public List<Genome> PerformElitism(ref List<Genome> populationForNextGeneration)
         {
             List<Genome> elitists = new List<Genome>();
 
@@ -109,7 +127,15 @@ namespace Neat
                 {
                     if (i < speciesTimestamp.AmountToGenerateByElitism)
                     {
-                        elitists.Add(new Genome(genome));
+                        Genome elitistCopy = new Genome(genome);
+                        elitistCopy.Id = "g" + (History.CurrentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
+                        elitistCopy.AdjustedFitness = 0;
+                        elitistCopy.Fitness = 0;
+                        elitistCopy.Generation = null;
+                        elitistCopy.Species = null;
+
+                        elitists.Add(elitistCopy);
+                        populationForNextGeneration.Add(elitistCopy);
                     }
                     else
                     {
@@ -122,7 +148,7 @@ namespace Neat
             return elitists;
         }
 
-        public List<Genome> PerformCrossover()
+        public List<Genome> PerformCrossover(ref List<Genome> populationForNextGeneration)
         {
             List<Genome> offspring = new List<Genome>();
 
@@ -160,8 +186,11 @@ namespace Neat
 
                     // Actually perform the crossover and put the child 
                     // into the list of Genomes for the next Generation
-                    Genome child = ActuallyCrossover(parent1, parent2);
+                    string idForChild = "g" + (History.CurrentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
+                    Genome child = ActuallyCrossover(parent1, parent2, idForChild);
+
                     offspring.Add(child);
+                    populationForNextGeneration.Add(child);
                 }
             }
 
@@ -207,13 +236,141 @@ namespace Neat
                     && Utils.random.NextDouble() <= Config.chanceForInterspeciesCrossover);
         }
 
-        private Genome ActuallyCrossover(Genome parent1, Genome parent2)
+        private Genome ActuallyCrossover(Genome parent1, Genome parent2, string idForChild)
         {
-            Genome child;
+            Genome child = new Genome(idForChild, Config.numberOfInputs, Config.numberOfOutputs);
 
+            bool equalFitness = false;
+            Genome parentHigherFitness, parentLowerFitness;
+            if (parent1.Fitness == parent2.Fitness)
+            {
+                equalFitness = true;
+            }
+            if (parent1.Fitness >= parent2.Fitness)
+            {
+                parentHigherFitness = parent1;
+                parentLowerFitness = parent2;
+            }
+            else
+            {
+                parentHigherFitness = parent2;
+                parentLowerFitness = parent1;
+            }
 
+            Dictionary<int, ConnectionGene> connectionGenesParentHigherFitness = parentHigherFitness.GetConnectionGenesByInnovationNumber();
+            Dictionary<int, ConnectionGene> connectionGenesParentLowerFitness = parentLowerFitness.GetConnectionGenesByInnovationNumber();
 
+            int lowestInnovationNumber = Math.Min(connectionGenesParentHigherFitness.Keys.Min(), connectionGenesParentLowerFitness.Keys.Min());
+            int highestInnovationNumber = Math.Max(connectionGenesParentHigherFitness.Keys.Max(), connectionGenesParentLowerFitness.Keys.Max());
+            
+            for (int i = lowestInnovationNumber; i <= highestInnovationNumber; i++)
+            {
+                ConnectionGene connectionGeneParentHigherFitness = connectionGenesParentHigherFitness[i];
+                ConnectionGene connectionGeneParentLowerFitness = connectionGenesParentLowerFitness[i];
+                ConnectionGene chosenConnectionGene = null, rejectedConnectionGene = null;
+                ConnectionGene connectionGeneChild;
+                
+                if (connectionGeneParentHigherFitness == null && connectionGeneParentLowerFitness == null)
+                {
+                    // No parent has a ConnectionGene with this InnovationNumber
+                    // Just move on to the next InnovationNumber
+                    continue;
+                }
+                if (connectionGeneParentHigherFitness == null || connectionGeneParentLowerFitness == null)
+                {
+                    // Only one parent has a ConnectionGene with this InnovationNumber (it's Excess or Disjoint)
+                    // Choose the ConnectionGene from the more fit parent unless they have equal fitness
+                    if (equalFitness)
+                    {
+                        // If they have equal fitness choose the ConnectionGene by random
+                        int rand = Utils.random.Next(2); // rand is 0 or 1
+                        if (rand == 0)
+                        {
+                            chosenConnectionGene = connectionGeneParentHigherFitness;
+                            rejectedConnectionGene = connectionGeneParentLowerFitness;
+                        }
+                        else
+                        {
+                            chosenConnectionGene = connectionGeneParentLowerFitness;
+                            rejectedConnectionGene = connectionGeneParentHigherFitness;
+                        }                        
+                    }
+                    else
+                    {
+                        // If they don't have equal fitness choose the ConnectionGene of the fitter parent
+                        chosenConnectionGene = connectionGeneParentHigherFitness;
+                        rejectedConnectionGene = connectionGeneParentLowerFitness;
+                    }
+                }
+                if (connectionGeneParentHigherFitness != null && connectionGeneParentLowerFitness != null)
+                {
+                    // Both parents have a ConnectionGene with this InnovationNumber
+                    // Choose the ConnectionGene by random
+                    int rand = Utils.random.Next(2); // rand is 0 or 1
+                    if (rand == 0)
+                    {
+                        chosenConnectionGene = connectionGeneParentHigherFitness;
+                        rejectedConnectionGene = connectionGeneParentLowerFitness;
+                    }
+                    else
+                    {
+                        chosenConnectionGene = connectionGeneParentLowerFitness;
+                        rejectedConnectionGene = connectionGeneParentHigherFitness;
+                    }
+                }
+
+                connectionGeneChild = GetConnectionGeneByCrossover(chosenConnectionGene, rejectedConnectionGene);
+
+                if (connectionGeneChild != null)
+                {
+                    connectionGeneChild.InnovationNumber = i;
+                    // Adds the ConnectionGene to the child and overwrites the 
+                    // NeuronGeneFrom and NeuronGeneTo properties with the actual
+                    // NeuronGenes of the child Genome (creates the NeuronGenes if they don't exist)
+                    child.AddConnectionGeneOverwriteNeuronGenes(connectionGeneChild);
+                }
+            }
+            
             return child;
+        }
+
+        private ConnectionGene GetConnectionGeneByCrossover(ConnectionGene chosenConnectionGene, ConnectionGene rejectedConnectionGene)
+        {
+            ConnectionGene connectionGeneChild = new ConnectionGene();
+
+            if (chosenConnectionGene == null)
+            {
+                // A non-existing ConnectionGene was selected
+                // Can happen if there is Disjoint or Excess
+                // or if there is an InnovationNumber without any match in the parents
+                // => No ConnectionGene for this InnovationNumber will be added to the child
+                return null;
+            }
+            
+            // Set the properties of connectionGeneChild
+            connectionGeneChild.Id = "c_" + chosenConnectionGene.NeuronGeneFrom.Id + "_" + chosenConnectionGene.NeuronGeneTo.Id;
+            connectionGeneChild.Weight = chosenConnectionGene.Weight;
+            connectionGeneChild.IsEnabled = chosenConnectionGene.IsEnabled;
+            if (!chosenConnectionGene.IsEnabled || (rejectedConnectionGene != null && !rejectedConnectionGene.IsEnabled))
+            {
+                // If the ConnectionGene is disabled in either parent it
+                // has a preset chance to stay disabled otherwise it gets enabled
+                if (Utils.random.NextDouble() < Config.chanceToDisableConnectionGeneIfDisabledInEitherParent)
+                {
+                    connectionGeneChild.IsEnabled = false;
+                }
+                else
+                {
+                    connectionGeneChild.IsEnabled = true;
+                }
+            }
+            // These will be overwritten with the corresponding NeuronGene of
+            // the child Genome later on
+            connectionGeneChild.NeuronGeneFrom = chosenConnectionGene.NeuronGeneFrom;
+            connectionGeneChild.NeuronGeneTo = chosenConnectionGene.NeuronGeneTo;
+
+            // Only InnovationNumber is missing
+            return connectionGeneChild;
         }
 
         /**

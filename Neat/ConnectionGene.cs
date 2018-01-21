@@ -18,6 +18,10 @@ namespace Neat
         public int InnovationNumber { get; set; }
         public bool IsEnabled { get; set; }
 
+        public ConnectionGene()
+        {
+        }
+
         public ConnectionGene(string id, int innovationNumber, bool isEnabled, double weight, NeuronGene neuronGeneFrom, NeuronGene neuronGeneTo)
         {
             Id = Id;

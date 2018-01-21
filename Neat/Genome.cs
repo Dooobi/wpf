@@ -94,7 +94,7 @@ namespace Neat
                     NeuronGene neuronGeneFrom = NeuronGenes[inputIndex];
                     NeuronGene neuronGeneTo = NeuronGenes[outputIndex + numberOfInputs + 1];
 
-                    AddConnectionGene(neuronGeneFrom, neuronGeneTo);
+                    AddBasicConnectionGene(neuronGeneFrom, neuronGeneTo);
                 }
             }
         }
@@ -112,7 +112,36 @@ namespace Neat
             return connectionGenesByInnovationNumber;
         }
 
-        public void AddConnectionGene(NeuronGene neuronGeneFrom, NeuronGene neuronGeneTo)
+        /* Adds the ConnectionGene to the child and overwrites the 
+         * NeuronGeneFrom and NeuronGeneTo properties with the actual
+         * NeuronGenes of the child Genome (creates the NeuronGenes if they don't exist)
+         */
+        public void AddConnectionGeneOverwriteNeuronGenes(ConnectionGene connectionGene)
+        {
+            string neuronGeneFromId = connectionGene.NeuronGeneFrom.Id;
+            string neuronGeneToId = connectionGene.NeuronGeneTo.Id;
+
+            NeuronGene neuronGeneFrom = NeuronGenes.Find(neuronGene => neuronGene.Id == neuronGeneFromId);
+            NeuronGene neuronGeneTo = NeuronGenes.Find(neuronGene => neuronGene.Id == neuronGeneToId);
+
+            if (neuronGeneFrom == null)
+            {
+                neuronGeneFrom = new NeuronGene(neuronGeneFromId, connectionGene.NeuronGeneFrom.Type);
+                NeuronGenes.Add(neuronGeneFrom);
+            }
+            if (neuronGeneFrom == null)
+            {
+                neuronGeneTo = new NeuronGene(neuronGeneToId, connectionGene.NeuronGeneTo.Type);
+                NeuronGenes.Add(neuronGeneTo);
+            }
+
+            connectionGene.NeuronGeneFrom = neuronGeneFrom;
+            connectionGene.NeuronGeneTo = neuronGeneTo;
+
+            ConnectionGenes.Add(connectionGene);
+        }
+
+        public void AddBasicConnectionGene(NeuronGene neuronGeneFrom, NeuronGene neuronGeneTo)
         {
             string connectionId = "c_" + neuronGeneFrom.Id + "_" + neuronGeneTo.Id;
             int innovationNumber = InnovationManager.Instance.GetInnovationNumber(neuronGeneFrom.Id, neuronGeneTo.Id);

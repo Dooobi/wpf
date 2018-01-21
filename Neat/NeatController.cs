@@ -31,7 +31,7 @@ namespace Neat
             
             if (CurrentPopulationAfterEvaluation.Count == Config.populationSize)
             {
-                GeneticAlgorithm.Epoch();
+                GeneticAlgorithm.Epoch(CurrentPopulationAfterEvaluation);
             }
         }
 

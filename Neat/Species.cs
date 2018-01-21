@@ -30,6 +30,32 @@ namespace Neat
             Id = id;
         }
 
+        /*
+         * Adds a Genome to this Species and also adds it 
+         * to the corresponding timestamp for the genomes Generation.
+         * If no timestamp exists for its Generation a new one will be created.
+         * 
+         * Updates the BestFitness of the Species
+         */
+        public void AddGenomeAndUpdateSpecies(Genome genome)
+        {
+            SpeciesTimestamp speciesTimestamp = SpeciesTimestamps[genome.Generation];
+            if (speciesTimestamp == null)
+            {
+                speciesTimestamp = new SpeciesTimestamp(this);
+                SpeciesTimestamps[genome.Generation] = speciesTimestamp;
+                speciesTimestamp.Leader = genome;
+            }
+
+            speciesTimestamp.Members.Add(genome);
+            Population.Add(genome);
+
+            if (genome.Fitness > BestFitness)
+            {
+                BestFitness = genome.Fitness;
+            }
+        }
+
         public static Species FromJObject(JObject json)
         {
             Species species = new Species();
