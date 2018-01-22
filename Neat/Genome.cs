@@ -99,6 +99,11 @@ namespace Neat
             }
         }
 
+        public void GenerateNetwork()
+        {
+
+        }
+
         public string GetNextNeuronGeneId(NeuronType neuronType)
         {
             List<NeuronGene> neuronGenesOfType = new List<NeuronGene>();

@@ -31,7 +31,13 @@ namespace Neat
             
             if (CurrentPopulationAfterEvaluation.Count == Config.populationSize)
             {
-                GeneticAlgorithm.Epoch(CurrentPopulationAfterEvaluation);
+                List<Genome> populationForNextGeneration = GeneticAlgorithm.Epoch(CurrentPopulationAfterEvaluation);
+
+                foreach (Genome g in populationForNextGeneration)
+                {
+                    g.GenerateNetwork();
+                    CurrentPopulationBeforeEvaluation.Push(g);
+                }
             }
         }
 

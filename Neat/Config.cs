@@ -10,7 +10,7 @@ namespace Neat
     {
         public static int populationSize = 100;
         public static int numberOfInputs = 2;
-        public static int numberOfOutputs = 3;
+        public static int numberOfOutputs = 1;
         public static double minWeightLimit = -1.0;
         public static double maxWeightLimit = 1.0;
         public static double compatibilityThreshold = 3.0;
