@@ -44,13 +44,13 @@ namespace WpfApp1
             inputPatterns.Add(new List<double>(new double[] { 1, 1 }));
             answers = new List<double>(new double[] { 0, 1, 1, 0 });
 
-            World myWorld = new World();
+            //World myWorld = new World();
             
-            myPanel.Children.Add(new Graph(GetGraph()));
-            myPanel.Children.Add(new Graph(GetGraph()));
+            //myPanel.Children.Add(new Graph(GetGraph()));
+            //myPanel.Children.Add(new Graph(GetGraph()));
 
-            Grid.SetRow(myPanel.Children[0], 1);
-            Grid.SetRow(myPanel.Children[0], 1);
+            //Grid.SetRow(myPanel.Children[0], 1);
+            //Grid.SetRow(myPanel.Children[0], 1);
         }
 
         private void TestGeneticAlgorithm()

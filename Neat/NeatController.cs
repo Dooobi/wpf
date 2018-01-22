@@ -18,6 +18,7 @@ namespace Neat
         {
             GeneticAlgorithm = new GeneticAlgorithm();
             History.InitHistory();
+            CreateInitialPopulation();
         }
 
         public Genome GetNextGenomeToEvaluate()
