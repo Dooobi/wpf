@@ -33,6 +33,11 @@ namespace Neat
             // better the fitness of a Genome is
             PerformCrossover(ref populationForNextGeneration);
 
+            // Mutation
+            // Perturbs Connection weights with a chance
+            // 
+            PerformMutation(ref populationForNextGeneration);
+
             // Mutation (Applied to every genome but only with a certain percentage)
             
             // Determine species
@@ -269,7 +274,7 @@ namespace Neat
 
             // Determine how many genomes for each species of next generation
             // should come from elitism and how many from breeding
-            int numGenomesFromElitism, numGenomesFromCrossover;
+            int numGenomesFromElitism, numGenomesFromCrossover, numGenomesFromMutation;
 
             foreach (Species species in speciesOfThisGeneration)
             {
@@ -278,13 +283,12 @@ namespace Neat
                 numGenomesFromElitism = (int)(speciesTimestamp.Members.Count / Config.genomesFromElitismRatio);
                 numGenomesFromElitism = Math.Min(numGenomesFromElitism, speciesTimestamp.AmountToGenerateForNextGeneration);
 
-                numGenomesFromCrossover = speciesTimestamp.AmountToGenerateForNextGeneration - numGenomesFromElitism;
+                numGenomesFromMutation = (int)((speciesTimestamp.AmountToGenerateForNextGeneration - numGenomesFromElitism) * Config.ratioOfOffspringByMutation);
+                numGenomesFromCrossover = speciesTimestamp.AmountToGenerateForNextGeneration - (numGenomesFromElitism + numGenomesFromMutation);
 
                 speciesTimestamp.AmountToGenerateByElitism = numGenomesFromElitism;
                 speciesTimestamp.AmountToGenerateByCrossover = numGenomesFromCrossover;
-
-                // OPTIONAL:
-                //  Determine how many genomes are created by mutation and how many by crossover
+                speciesTimestamp.AmountToGenerateByMutation = numGenomesFromMutation;
             }
         }
 

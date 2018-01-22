@@ -19,7 +19,10 @@ namespace Neat
         public static double offspringFromMutationRatio = 0.25;
         public static double maxChanceForSelectionToCrossover = 0.4;
         public static double minChanceForSelectionToCrossover = 0.05;
-        public static double chanceForInterspeciesCrossover = 0.0;
+        public static double chanceForInterspeciesCrossover = 0.001;
         public static double chanceToDisableConnectionGeneIfDisabledInEitherParent = 0.75;
+
+        public static double ratioOfOffspringByMutation = 0.25;
+
     }
 }

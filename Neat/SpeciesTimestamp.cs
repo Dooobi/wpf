@@ -14,6 +14,7 @@ namespace Neat
         public int AmountToGenerateForNextGeneration { get; set; }
         public int AmountToGenerateByElitism { get; set; }
         public int AmountToGenerateByCrossover { get; set; }
+        public int AmountToGenerateByMutation { get; set; }
 
         public SpeciesTimestamp(Species species)
         {
