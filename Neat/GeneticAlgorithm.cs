@@ -168,51 +168,89 @@ namespace Neat
         {
             List<Genome> offspring = new List<Genome>();
 
+            // Crossover for every Species
             foreach (Species species in History.Speciess[History.CurrentGeneration])
             {
                 SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[History.CurrentGeneration];
 
-                bool isInterspeciesCrossover = CheckInterspeciesCrossover();
+                // Until the amount to generate by crossover is reached by that Species
+                for (int i = 0; i < speciesTimestamp.AmountToGenerateByCrossover; i++) { 
 
-                // To allow crossover either
-                //  the Species needs at least 2 members 
-                //  or interspecies crossover must be active
-                if (speciesTimestamp.Members.Count > 1 || isInterspeciesCrossover)
-                {
-                    // Select parent1 for crossover (list needs to be sorted by fitness)
-                    speciesTimestamp.Members.Sort((genome1, genome2) => genome1.Fitness.CompareTo(genome2.Fitness));
-                    Genome parent1 = SelectGenomeForCrossover(speciesTimestamp.Members, null);
+                    bool isInterspeciesCrossover = CheckInterspeciesCrossover();
 
-                    // Select parent2 for crossover
-                    Genome parent2;
-                    if (isInterspeciesCrossover)
+                    // To allow crossover either
+                    //  the Species needs at least 2 members 
+                    //  or interspecies crossover must be active
+                    if (speciesTimestamp.Members.Count > 1 || isInterspeciesCrossover)
                     {
-                        // In case of interspecies crossover the second parent will
-                        // be selected from a list of all the Genomes from this Generation (no matter the Species)
-                        History.CurrentGeneration.Population.Sort((genome1, genome2) => genome1.Fitness.CompareTo(genome2.Fitness));
-                        // Parent1 must be excluded from the list of available Genomes (second parameter)
-                        parent2 = SelectGenomeForCrossover(History.CurrentGeneration.Population, parent1);
-                    }
-                    else
-                    {
-                        // In case of regular crossover the second parent will just be selected
-                        // from a list of Genomes within the same species as parent1 (but parent1 must be excluded)
-                        parent2 = SelectGenomeForCrossover(speciesTimestamp.Members, parent1);
-                    }
+                        // Select parent1 for crossover (list needs to be sorted by fitness)
+                        speciesTimestamp.Members.Sort((genome1, genome2) => genome1.Fitness.CompareTo(genome2.Fitness));
+                        Genome parent1 = SelectGenomeForCrossover(speciesTimestamp.Members, null);
 
-                    // Actually perform the crossover and put the child 
-                    // into the list of Genomes for the next Generation
-                    string idForChild = "g" + (History.CurrentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
-                    Genome child = ActuallyCrossover(parent1, parent2, idForChild);
+                        // Select parent2 for crossover
+                        Genome parent2;
+                        if (isInterspeciesCrossover)
+                        {
+                            // In case of interspecies crossover the second parent will
+                            // be selected from a list of all the Genomes from this Generation (no matter the Species)
+                            History.CurrentGeneration.Population.Sort((genome1, genome2) => genome1.Fitness.CompareTo(genome2.Fitness));
+                            // Parent1 must be excluded from the list of available Genomes (second parameter)
+                            parent2 = SelectGenomeForCrossover(History.CurrentGeneration.Population, parent1);
+                        }
+                        else
+                        {
+                            // In case of regular crossover the second parent will just be selected
+                            // from a list of Genomes within the same species as parent1 (but parent1 must be excluded)
+                            parent2 = SelectGenomeForCrossover(speciesTimestamp.Members, parent1);
+                        }
 
-                    offspring.Add(child);
-                    populationForNextGeneration.Add(child);
+                        // Actually perform the crossover and put the child 
+                        // into the list of Genomes for the next Generation
+                        string idForChild = "g" + (History.CurrentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
+                        Genome child = Crossover(parent1, parent2, idForChild);
+
+                        offspring.Add(child);
+                        populationForNextGeneration.Add(child);
+                    }
                 }
             }
 
             return offspring;
         }
                 
+        public List<Genome> PerformMutation(ref List<Genome> populationForNextGeneration)
+        {
+            List<Genome> mutants = new List<Genome>();
+
+            foreach (Genome genome in populationForNextGeneration)
+            {
+                // Mutate by chance
+            }
+
+            foreach (Species species in History.Speciess[History.CurrentGeneration])
+            {
+                SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[History.CurrentGeneration];
+
+                for (int i = 0; i < speciesTimestamp.AmountToGenerateByMutation; i++)
+                {
+                    Genome selectedGenome = SelectGenomeForMutation(speciesTimestamp.Members);
+                    Genome mutant = new Genome(selectedGenome);
+                    mutant.Id = "g" + (History.CurrentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
+                    mutant.AdjustedFitness = 0;
+                    mutant.Fitness = 0;
+                    mutant.Generation = null;
+                    mutant.Species = null;
+
+                    mutant.Mutate();
+
+                    mutants.Add(mutant);
+                    populationForNextGeneration.Add(mutant);
+                }
+            }
+
+            return mutants;
+        }
+
         /**
          * Determines how many genomes are generated by:
          *  - elitism
@@ -347,7 +385,70 @@ namespace Neat
             return null;
         }
 
-        private Genome ActuallyCrossover(Genome parent1, Genome parent2, string idForChild)
+        /*
+        * Uses the configured minChanceForSelectionToMutate and maxChanceForSelectionToMutate
+        * to select a Genome from a list of Genomes which is sorted by fitness (lower index = lower fitness)
+        */
+        private Genome SelectGenomeForMutation(List<Genome> availableGenomes)
+        {
+            int highestIndex = availableGenomes.Count - 1;
+            double gradientOfChanceForSelection = (Config.maxChanceForSelectionToCrossover - Config.minChanceForSelectionToCrossover) / highestIndex;
+            double rand = Utils.RandDouble(Config.minChanceForSelectionToCrossover, Config.maxChanceForSelectionToCrossover);
+
+            // Go through the list of genomes from best to worst (highest chance to lowest chance)
+            // and check if it has been selected by the random number
+            double currentChance;
+            for (int i = highestIndex, c = 0; i >= 0; i--, c++)
+            {
+                currentChance = Config.maxChanceForSelectionToCrossover - c * gradientOfChanceForSelection;
+
+                if (rand >= currentChance)
+                {
+                    return availableGenomes[i];
+                }
+            }
+
+            return null;
+        }
+
+        private void Mutate(Genome genome)
+        {
+            // Check if the Connection weights should be mutated
+            if (Utils.random.NextDouble() < Config.chanceToMutateWeightsOfGenome)
+            {
+                MutateWeights(genome);
+            }
+
+
+        }
+
+        private void MutateWeights(Genome genome)
+        {
+            // Mutate Connection weights
+            foreach (ConnectionGene connectionGene in genome.ConnectionGenes)
+            {
+                // Every Connection weight has a chance to be mutated
+                if (Utils.random.NextDouble() < Config.chanceToMutateOneWeight)
+                {
+                    // Mutate this connection weight
+                    if (Utils.random.NextDouble() < Config.chanceForRandomizingWeight)
+                    {
+                        // Completely randomize this Connection weight
+                        connectionGene.Weight = Utils.RandDouble(Config.minWeightLimit, Config.maxWeightLimit);
+                    }
+                    else
+                    {
+                        // Perturb this Connection weight
+                        connectionGene.Weight += Utils.random.NextDouble() * Config.maxWeightPerturbation;
+                        // Don't overshoot the limits
+                        connectionGene.Weight = Math.Max(connectionGene.Weight, Config.minWeightLimit);
+                        connectionGene.Weight = Math.Min(connectionGene.Weight, Config.maxWeightLimit);
+                    }
+                }
+            }
+        }
+
+        private Genome Crossover(Genome parent1, Genome parent2, string idForChild)
         {
             Genome child = new Genome(idForChild, Config.numberOfInputs, Config.numberOfOutputs);
 
