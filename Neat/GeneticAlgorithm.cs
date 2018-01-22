@@ -46,6 +46,17 @@ namespace Neat
             return populationForNextGeneration;
         }
 
+
+        /****************************************************************/
+        /*********************** EVOLUTION METHODS **********************/
+        /****************************************************************/
+        // - Speciate
+        // - PerformElitism
+        // - PerformCrossover
+        // - DetermineAmountToGenerateForEachSpecies
+        // - AdjustFitness
+        /****************************************************************/
+
         //------------------ SpeciateAndCalculateSpawnLevels ---------------------
         //
         //  separates each individual into its respective species by calculating
@@ -196,183 +207,7 @@ namespace Neat
 
             return offspring;
         }
-        
-        /*
-         * Uses the configured minChanceForSelectionToCrossover and maxChanceForSelectionToCrossover
-         * to select a Genome from a list of Genomes which is sorted by fitness (lower index = lower fitness)
-         */
-        private Genome SelectGenomeForCrossover(List<Genome> availableGenomes, Genome excludedFromAvailableGenomes)
-        {
-            // Copy the list and remove the excluded Genome in the copied list
-            List<Genome> actuallyAvailableGenomes = new List<Genome>(availableGenomes);
-            if (excludedFromAvailableGenomes != null)
-            {
-                availableGenomes.Remove(excludedFromAvailableGenomes);
-            }
-
-            int highestIndex = actuallyAvailableGenomes.Count - 1;
-            double gradientOfChanceForSelection = (Config.maxChanceForSelectionToCrossover - Config.minChanceForSelectionToCrossover) / highestIndex;
-            double rand = Utils.RandDouble(Config.minChanceForSelectionToCrossover, Config.maxChanceForSelectionToCrossover);
-
-            // Go through the list of genomes from best to worst (highest chance to lowest chance)
-            // and check if it has been selected by the random number
-            double currentChance;
-            for (int i = highestIndex, c = 0; i >= 0; i--, c++)
-            {
-                currentChance = Config.maxChanceForSelectionToCrossover - c * gradientOfChanceForSelection;
-
-                if (rand >= currentChance)
-                {
-                    return actuallyAvailableGenomes[i];
-                }
-            }
-
-            return null;
-        }
-
-        private bool CheckInterspeciesCrossover()
-        {
-            return (History.Speciess[History.CurrentGeneration].Count >= 2
-                    && Utils.random.NextDouble() <= Config.chanceForInterspeciesCrossover);
-        }
-
-        private Genome ActuallyCrossover(Genome parent1, Genome parent2, string idForChild)
-        {
-            Genome child = new Genome(idForChild, Config.numberOfInputs, Config.numberOfOutputs);
-
-            bool equalFitness = false;
-            Genome parentHigherFitness, parentLowerFitness;
-            if (parent1.Fitness == parent2.Fitness)
-            {
-                equalFitness = true;
-            }
-            if (parent1.Fitness >= parent2.Fitness)
-            {
-                parentHigherFitness = parent1;
-                parentLowerFitness = parent2;
-            }
-            else
-            {
-                parentHigherFitness = parent2;
-                parentLowerFitness = parent1;
-            }
-
-            Dictionary<int, ConnectionGene> connectionGenesParentHigherFitness = parentHigherFitness.GetConnectionGenesByInnovationNumber();
-            Dictionary<int, ConnectionGene> connectionGenesParentLowerFitness = parentLowerFitness.GetConnectionGenesByInnovationNumber();
-
-            int lowestInnovationNumber = Math.Min(connectionGenesParentHigherFitness.Keys.Min(), connectionGenesParentLowerFitness.Keys.Min());
-            int highestInnovationNumber = Math.Max(connectionGenesParentHigherFitness.Keys.Max(), connectionGenesParentLowerFitness.Keys.Max());
-            
-            for (int i = lowestInnovationNumber; i <= highestInnovationNumber; i++)
-            {
-                ConnectionGene connectionGeneParentHigherFitness = connectionGenesParentHigherFitness[i];
-                ConnectionGene connectionGeneParentLowerFitness = connectionGenesParentLowerFitness[i];
-                ConnectionGene chosenConnectionGene = null, rejectedConnectionGene = null;
-                ConnectionGene connectionGeneChild;
                 
-                if (connectionGeneParentHigherFitness == null && connectionGeneParentLowerFitness == null)
-                {
-                    // No parent has a ConnectionGene with this InnovationNumber
-                    // Just move on to the next InnovationNumber
-                    continue;
-                }
-                if (connectionGeneParentHigherFitness == null || connectionGeneParentLowerFitness == null)
-                {
-                    // Only one parent has a ConnectionGene with this InnovationNumber (it's Excess or Disjoint)
-                    // Choose the ConnectionGene from the more fit parent unless they have equal fitness
-                    if (equalFitness)
-                    {
-                        // If they have equal fitness choose the ConnectionGene by random
-                        int rand = Utils.random.Next(2); // rand is 0 or 1
-                        if (rand == 0)
-                        {
-                            chosenConnectionGene = connectionGeneParentHigherFitness;
-                            rejectedConnectionGene = connectionGeneParentLowerFitness;
-                        }
-                        else
-                        {
-                            chosenConnectionGene = connectionGeneParentLowerFitness;
-                            rejectedConnectionGene = connectionGeneParentHigherFitness;
-                        }                        
-                    }
-                    else
-                    {
-                        // If they don't have equal fitness choose the ConnectionGene of the fitter parent
-                        chosenConnectionGene = connectionGeneParentHigherFitness;
-                        rejectedConnectionGene = connectionGeneParentLowerFitness;
-                    }
-                }
-                if (connectionGeneParentHigherFitness != null && connectionGeneParentLowerFitness != null)
-                {
-                    // Both parents have a ConnectionGene with this InnovationNumber
-                    // Choose the ConnectionGene by random
-                    int rand = Utils.random.Next(2); // rand is 0 or 1
-                    if (rand == 0)
-                    {
-                        chosenConnectionGene = connectionGeneParentHigherFitness;
-                        rejectedConnectionGene = connectionGeneParentLowerFitness;
-                    }
-                    else
-                    {
-                        chosenConnectionGene = connectionGeneParentLowerFitness;
-                        rejectedConnectionGene = connectionGeneParentHigherFitness;
-                    }
-                }
-
-                connectionGeneChild = GetConnectionGeneByCrossover(chosenConnectionGene, rejectedConnectionGene);
-
-                if (connectionGeneChild != null)
-                {
-                    connectionGeneChild.InnovationNumber = i;
-                    // Adds the ConnectionGene to the child and overwrites the 
-                    // NeuronGeneFrom and NeuronGeneTo properties with the actual
-                    // NeuronGenes of the child Genome (creates the NeuronGenes if they don't exist)
-                    child.AddConnectionGeneOverwriteNeuronGenes(connectionGeneChild);
-                }
-            }
-            
-            return child;
-        }
-
-        private ConnectionGene GetConnectionGeneByCrossover(ConnectionGene chosenConnectionGene, ConnectionGene rejectedConnectionGene)
-        {
-            ConnectionGene connectionGeneChild = new ConnectionGene();
-
-            if (chosenConnectionGene == null)
-            {
-                // A non-existing ConnectionGene was selected
-                // Can happen if there is Disjoint or Excess
-                // or if there is an InnovationNumber without any match in the parents
-                // => No ConnectionGene for this InnovationNumber will be added to the child
-                return null;
-            }
-            
-            // Set the properties of connectionGeneChild
-            connectionGeneChild.Id = "c_" + chosenConnectionGene.NeuronGeneFrom.Id + "_" + chosenConnectionGene.NeuronGeneTo.Id;
-            connectionGeneChild.Weight = chosenConnectionGene.Weight;
-            connectionGeneChild.IsEnabled = chosenConnectionGene.IsEnabled;
-            if (!chosenConnectionGene.IsEnabled || (rejectedConnectionGene != null && !rejectedConnectionGene.IsEnabled))
-            {
-                // If the ConnectionGene is disabled in either parent it
-                // has a preset chance to stay disabled otherwise it gets enabled
-                if (Utils.random.NextDouble() < Config.chanceToDisableConnectionGeneIfDisabledInEitherParent)
-                {
-                    connectionGeneChild.IsEnabled = false;
-                }
-                else
-                {
-                    connectionGeneChild.IsEnabled = true;
-                }
-            }
-            // These will be overwritten with the corresponding NeuronGene of
-            // the child Genome later on
-            connectionGeneChild.NeuronGeneFrom = chosenConnectionGene.NeuronGeneFrom;
-            connectionGeneChild.NeuronGeneTo = chosenConnectionGene.NeuronGeneTo;
-
-            // Only InnovationNumber is missing
-            return connectionGeneChild;
-        }
-
         /**
          * Determines how many genomes are generated by:
          *  - elitism
@@ -463,6 +298,191 @@ namespace Neat
                     genome.AdjustedFitness = adjustedFitness;
                 }
             }
+        }
+
+        /****************************************************************/
+        /************************ HELPER METHODS ************************/
+        /****************************************************************/
+        // - SelectGenomeForCrossover
+        // - ActuallyCrossover
+        // - GetConnectionGeneByCrossover
+        // - CheckInterspeciesCrossover
+        // - CalculateCompatibility
+        /****************************************************************/
+        /*
+         * Uses the configured minChanceForSelectionToCrossover and maxChanceForSelectionToCrossover
+         * to select a Genome from a list of Genomes which is sorted by fitness (lower index = lower fitness)
+         */
+        private Genome SelectGenomeForCrossover(List<Genome> availableGenomes, Genome excludedFromAvailableGenomes)
+        {
+            // Copy the list and remove the excluded Genome in the copied list
+            List<Genome> actuallyAvailableGenomes = new List<Genome>(availableGenomes);
+            if (excludedFromAvailableGenomes != null)
+            {
+                availableGenomes.Remove(excludedFromAvailableGenomes);
+            }
+
+            int highestIndex = actuallyAvailableGenomes.Count - 1;
+            double gradientOfChanceForSelection = (Config.maxChanceForSelectionToCrossover - Config.minChanceForSelectionToCrossover) / highestIndex;
+            double rand = Utils.RandDouble(Config.minChanceForSelectionToCrossover, Config.maxChanceForSelectionToCrossover);
+
+            // Go through the list of genomes from best to worst (highest chance to lowest chance)
+            // and check if it has been selected by the random number
+            double currentChance;
+            for (int i = highestIndex, c = 0; i >= 0; i--, c++)
+            {
+                currentChance = Config.maxChanceForSelectionToCrossover - c * gradientOfChanceForSelection;
+
+                if (rand >= currentChance)
+                {
+                    return actuallyAvailableGenomes[i];
+                }
+            }
+
+            return null;
+        }
+
+        private Genome ActuallyCrossover(Genome parent1, Genome parent2, string idForChild)
+        {
+            Genome child = new Genome(idForChild, Config.numberOfInputs, Config.numberOfOutputs);
+
+            bool equalFitness = false;
+            Genome parentHigherFitness, parentLowerFitness;
+            if (parent1.Fitness == parent2.Fitness)
+            {
+                equalFitness = true;
+            }
+            if (parent1.Fitness >= parent2.Fitness)
+            {
+                parentHigherFitness = parent1;
+                parentLowerFitness = parent2;
+            }
+            else
+            {
+                parentHigherFitness = parent2;
+                parentLowerFitness = parent1;
+            }
+
+            Dictionary<int, ConnectionGene> connectionGenesParentHigherFitness = parentHigherFitness.GetConnectionGenesByInnovationNumber();
+            Dictionary<int, ConnectionGene> connectionGenesParentLowerFitness = parentLowerFitness.GetConnectionGenesByInnovationNumber();
+
+            int lowestInnovationNumber = Math.Min(connectionGenesParentHigherFitness.Keys.Min(), connectionGenesParentLowerFitness.Keys.Min());
+            int highestInnovationNumber = Math.Max(connectionGenesParentHigherFitness.Keys.Max(), connectionGenesParentLowerFitness.Keys.Max());
+
+            for (int i = lowestInnovationNumber; i <= highestInnovationNumber; i++)
+            {
+                ConnectionGene connectionGeneParentHigherFitness = connectionGenesParentHigherFitness[i];
+                ConnectionGene connectionGeneParentLowerFitness = connectionGenesParentLowerFitness[i];
+                ConnectionGene chosenConnectionGene = null, rejectedConnectionGene = null;
+                ConnectionGene connectionGeneChild;
+
+                if (connectionGeneParentHigherFitness == null && connectionGeneParentLowerFitness == null)
+                {
+                    // No parent has a ConnectionGene with this InnovationNumber
+                    // Just move on to the next InnovationNumber
+                    continue;
+                }
+                if (connectionGeneParentHigherFitness == null || connectionGeneParentLowerFitness == null)
+                {
+                    // Only one parent has a ConnectionGene with this InnovationNumber (it's Excess or Disjoint)
+                    // Choose the ConnectionGene from the more fit parent unless they have equal fitness
+                    if (equalFitness)
+                    {
+                        // If they have equal fitness choose the ConnectionGene by random
+                        int rand = Utils.random.Next(2); // rand is 0 or 1
+                        if (rand == 0)
+                        {
+                            chosenConnectionGene = connectionGeneParentHigherFitness;
+                            rejectedConnectionGene = connectionGeneParentLowerFitness;
+                        }
+                        else
+                        {
+                            chosenConnectionGene = connectionGeneParentLowerFitness;
+                            rejectedConnectionGene = connectionGeneParentHigherFitness;
+                        }
+                    }
+                    else
+                    {
+                        // If they don't have equal fitness choose the ConnectionGene of the fitter parent
+                        chosenConnectionGene = connectionGeneParentHigherFitness;
+                        rejectedConnectionGene = connectionGeneParentLowerFitness;
+                    }
+                }
+                if (connectionGeneParentHigherFitness != null && connectionGeneParentLowerFitness != null)
+                {
+                    // Both parents have a ConnectionGene with this InnovationNumber
+                    // Choose the ConnectionGene by random
+                    int rand = Utils.random.Next(2); // rand is 0 or 1
+                    if (rand == 0)
+                    {
+                        chosenConnectionGene = connectionGeneParentHigherFitness;
+                        rejectedConnectionGene = connectionGeneParentLowerFitness;
+                    }
+                    else
+                    {
+                        chosenConnectionGene = connectionGeneParentLowerFitness;
+                        rejectedConnectionGene = connectionGeneParentHigherFitness;
+                    }
+                }
+
+                connectionGeneChild = GetConnectionGeneByCrossover(chosenConnectionGene, rejectedConnectionGene);
+
+                if (connectionGeneChild != null)
+                {
+                    connectionGeneChild.InnovationNumber = i;
+                    // Adds the ConnectionGene to the child and overwrites the 
+                    // NeuronGeneFrom and NeuronGeneTo properties with the actual
+                    // NeuronGenes of the child Genome (creates the NeuronGenes if they don't exist)
+                    child.AddConnectionGeneOverwriteNeuronGenes(connectionGeneChild);
+                }
+            }
+
+            return child;
+        }
+
+        private ConnectionGene GetConnectionGeneByCrossover(ConnectionGene chosenConnectionGene, ConnectionGene rejectedConnectionGene)
+        {
+            ConnectionGene connectionGeneChild = new ConnectionGene();
+
+            if (chosenConnectionGene == null)
+            {
+                // A non-existing ConnectionGene was selected
+                // Can happen if there is Disjoint or Excess
+                // or if there is an InnovationNumber without any match in the parents
+                // => No ConnectionGene for this InnovationNumber will be added to the child
+                return null;
+            }
+
+            // Set the properties of connectionGeneChild
+            connectionGeneChild.Id = "c_" + chosenConnectionGene.NeuronGeneFrom.Id + "_" + chosenConnectionGene.NeuronGeneTo.Id;
+            connectionGeneChild.Weight = chosenConnectionGene.Weight;
+            connectionGeneChild.IsEnabled = chosenConnectionGene.IsEnabled;
+            if (!chosenConnectionGene.IsEnabled || (rejectedConnectionGene != null && !rejectedConnectionGene.IsEnabled))
+            {
+                // If the ConnectionGene is disabled in either parent it
+                // has a preset chance to stay disabled otherwise it gets enabled
+                if (Utils.random.NextDouble() < Config.chanceToDisableConnectionGeneIfDisabledInEitherParent)
+                {
+                    connectionGeneChild.IsEnabled = false;
+                }
+                else
+                {
+                    connectionGeneChild.IsEnabled = true;
+                }
+            }
+            // These will be overwritten with the corresponding NeuronGene of
+            // the child Genome later on
+            connectionGeneChild.NeuronGeneFrom = chosenConnectionGene.NeuronGeneFrom;
+            connectionGeneChild.NeuronGeneTo = chosenConnectionGene.NeuronGeneTo;
+
+            // Only InnovationNumber is missing
+            return connectionGeneChild;
+        }
+
+        private bool CheckInterspeciesCrossover()
+        {
+            return (History.Speciess[History.CurrentGeneration].Count >= 2
+                    && Utils.random.NextDouble() <= Config.chanceForInterspeciesCrossover);
         }
 
         private double CalculateCompatibility(Genome genome1, Genome genome2)
