@@ -13,16 +13,21 @@ namespace Neat
         {
             List<Genome> populationForNextGeneration = new List<Genome>();
 
-            Generation newGeneration = new Generation(History.CurrentGeneration.Number + 1);
-            History.Generations.Add(newGeneration);
+            Generation newGeneration = new Generation(History.CreateNextGeneration());
+            History.AddGeneration(newGeneration);
 
             foreach (Genome genome in populationOfCurrentGeneration)
             {
                 genome.Generation = History.CurrentGeneration;
-                History.CurrentGeneration.AddGenome(genome);
             }
 
             Speciate(populationOfCurrentGeneration);
+
+            foreach (Genome genome in populationOfCurrentGeneration)
+            {
+                History.CurrentGeneration.AddGenome(genome);
+            }
+
             AdjustFitness();
             DetermineAmountToGenerateForEachSpecies();
             
@@ -71,24 +76,36 @@ namespace Neat
         // History.CurrentGeneration is the Generation of the evaluated Population
         private void Speciate(List<Genome> evaluatedPopulation)
         {
-            List<Species> availableSpeciesForThisGeneration = new List<Species>(History.Speciess[History.PreviousGeneration]);
+            List<Species> availableSpeciesForThisGeneration;
+            if (History.PreviousGeneration == null)
+            {
+                availableSpeciesForThisGeneration = new List<Species>();
+            }
+            else
+            {
+                availableSpeciesForThisGeneration = new List<Species>(History.Speciess[History.PreviousGeneration]);
+            }
 
             foreach (Genome genome in evaluatedPopulation)
-            {                
-                availableSpeciesForThisGeneration.AddRange(History.Speciess[History.CurrentGeneration]);
+            {
+                try
+                {
+                    availableSpeciesForThisGeneration.AddRange(History.Speciess[History.CurrentGeneration]);
+                }
+                catch { }
 
                 foreach (Species species in availableSpeciesForThisGeneration)
                 {
                     Genome leaderGenome;
-                    if (species.SpeciesTimestamps[History.PreviousGeneration] != null)
+                    try
                     {
                         // Take the leader of this Species from the previous Generation
                         leaderGenome = species.SpeciesTimestamps[History.PreviousGeneration].Leader;
                     }
-                    else
+                    catch
                     {
                         // If the Species was created during this Epoch there won't be a
-                        // leader of this Species for last Generation.
+                        // leader of this Species for the previous Generation.
                         // So take the leader of this Generation instead
                         leaderGenome = species.SpeciesTimestamps[History.CurrentGeneration].Leader;
                     }
@@ -107,17 +124,28 @@ namespace Neat
                     }
                 }
 
-                // Genome is not compatible with any existing species -> create a new species
-                string speciesId = "g" + History.CurrentGeneration.Number + "s" + (History.Speciess[History.CurrentGeneration].Count + 1);
-                Species newSpecies = new Species(speciesId);
-                SpeciesTimestamp speciesTimestamp = new SpeciesTimestamp(newSpecies);
-                newSpecies.SpeciesTimestamps[History.CurrentGeneration] = speciesTimestamp;
-                speciesTimestamp.Leader = genome;
+                if (genome.Species == null)
+                {
+                    // Genome is not compatible with any existing species -> create a new species
+                    string speciesId;
+                    try
+                    {
+                        speciesId = "g" + History.CurrentGeneration.Number + "s" + (History.Speciess[History.CurrentGeneration].Count + 1);
+                    }
+                    catch
+                    {
+                        speciesId = "g" + History.CurrentGeneration.Number + "s" + 1;
+                    }
+                    Species newSpecies = new Species(speciesId);
+                    SpeciesTimestamp speciesTimestamp = new SpeciesTimestamp(newSpecies);
+                    newSpecies.SpeciesTimestamps[History.CurrentGeneration] = speciesTimestamp;
+                    speciesTimestamp.Leader = genome;
 
-                // Adds genome to Species and SpeciesTimestamp and update BestFitness of Species
-                newSpecies.AddGenomeAndUpdateSpecies(genome); 
-                genome.Species = newSpecies;
-                History.Speciess[History.CurrentGeneration].Add(newSpecies);
+                    // Adds genome to Species and SpeciesTimestamp and update BestFitness of Species
+                    newSpecies.AddGenomeAndUpdateSpecies(genome);
+                    genome.Species = newSpecies;
+                    History.Speciess[History.CurrentGeneration].Add(newSpecies);
+                }                
             }
 
             // Determine leaders for the speciess in the current generation

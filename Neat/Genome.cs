@@ -88,7 +88,7 @@ namespace Neat
             {
                 // For every input NeuronGene and the bias NeuronGene:
                 //  Go through every output NeuronGene
-                for (int outputIndex = 0; outputIndex < numberOfOutputs + 1; outputIndex++)
+                for (int outputIndex = 0; outputIndex < numberOfOutputs; outputIndex++)
                 {
                     // And connect the input/bias NeuronGene with the output NeuronGene
                     NeuronGene neuronGeneFrom = NeuronGenes[inputIndex];

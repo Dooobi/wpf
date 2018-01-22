@@ -16,6 +16,8 @@ namespace Neat
 
         public NeatController()
         {
+            CurrentPopulationBeforeEvaluation = new Stack<Genome>();
+            CurrentPopulationAfterEvaluation = new List<Genome>();
             GeneticAlgorithm = new GeneticAlgorithm();
             History.InitHistory();
             CreateInitialPopulation();
@@ -33,6 +35,8 @@ namespace Neat
             if (CurrentPopulationAfterEvaluation.Count == Config.populationSize)
             {
                 List<Genome> populationForNextGeneration = GeneticAlgorithm.Epoch(CurrentPopulationAfterEvaluation);
+                CurrentPopulationBeforeEvaluation.Clear();
+                CurrentPopulationAfterEvaluation.Clear();
 
                 foreach (Genome g in populationForNextGeneration)
                 {
@@ -44,13 +48,15 @@ namespace Neat
 
         private void CreateInitialPopulation()
         {
-            CurrentPopulationBeforeEvaluation = new Stack<Genome>();
+            CurrentPopulationBeforeEvaluation.Clear();
             int generationOfPopulation = History.Generations.Count + 1;
 
             for (int i = 0; i < Config.populationSize; i++)
             {
                 string id = "g" + generationOfPopulation + ": " + i;
-                CurrentPopulationBeforeEvaluation.Push(new Genome(id, Config.numberOfInputs, Config.numberOfOutputs));
+                Genome genome = new Genome(id, Config.numberOfInputs, Config.numberOfOutputs);
+                genome.GenerateNetwork(ActivationFunction.SigmoidModified);
+                CurrentPopulationBeforeEvaluation.Push(genome);
             }
         }
     }

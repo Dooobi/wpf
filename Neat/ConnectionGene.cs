@@ -24,7 +24,7 @@ namespace Neat
 
         public ConnectionGene(string id, int innovationNumber, bool isEnabled, double weight, NeuronGene neuronGeneFrom, NeuronGene neuronGeneTo)
         {
-            Id = Id;
+            Id = id;
             InnovationNumber = innovationNumber;
             IsEnabled = isEnabled;
             Weight = weight;

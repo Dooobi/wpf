@@ -21,6 +21,7 @@ namespace Neat
         private Species()
         {
             Population = new List<Genome>();
+            SpeciesTimestamps = new Dictionary<Generation, SpeciesTimestamp>();
             Id = "undefined";
             GenerationsNoImprovement = 0;
         }

@@ -150,8 +150,9 @@ namespace NeuralNetwork
                 neuron.Output = 0.0;
             }
 
-            // Update the network once completely for every HiddenNeuron it contains
-            for (int i = 0; i < HiddenNeurons.Count; i++)
+            // Update the network once completely for every HiddenNeuron and OutputNeuron it contains
+            int numberHiddenAndOutputNeurons = HiddenNeurons.Count + OutputNeurons.Count;
+            for (int i = 0; i < numberHiddenAndOutputNeurons; i++)
             {
                 // Go through every hidden and output Neuron and calculate their NewOutput
                 //  based on the sum of the Output from incoming Neurons (Output of Neurons is 0.0 at the beginning)

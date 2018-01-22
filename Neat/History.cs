@@ -43,6 +43,20 @@ namespace Neat
             }
         }
 
+        public static Generation CreateNextGeneration()
+        {
+            if (CurrentGeneration == null) {
+                return new Generation(1);
+            }
+            return new Generation(CurrentGeneration.Number + 1);
+        }
+
+        public static void AddGeneration(Generation generation)
+        {
+            Generations.Add(generation);
+            Speciess[generation] = new List<Species>();
+        }
+
         //public static void AddGenomeToHistory(Genome genome)
         //{
         //    if (genome.Generation == null)
