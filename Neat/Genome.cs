@@ -99,6 +99,38 @@ namespace Neat
             }
         }
 
+        public string GetNextNeuronGeneId(NeuronType neuronType)
+        {
+            List<NeuronGene> neuronGenesOfType = new List<NeuronGene>();
+            foreach (NeuronGene neuronGene in NeuronGenes)
+            {
+                if (neuronGene.Type == neuronType)
+                {
+                    neuronGenesOfType.Add(neuronGene);
+                }
+            }
+            string id = "";
+            switch (neuronType)
+            {
+                case NeuronType.Hidden:
+                    id = "h";
+                    break;
+                case NeuronType.Bias:
+                    id = "bias";
+                    break;
+                case NeuronType.Input:
+                    id = "in";
+                    break;
+                case NeuronType.Output:
+                    id = "out";
+                    break;
+                case NeuronType.None:
+                    id = "none";
+                    break;
+            }
+            return id + (neuronGenesOfType.Count+1);
+        }
+
         public Dictionary<int, ConnectionGene> GetConnectionGenesByInnovationNumber()
         {
             Dictionary<int, ConnectionGene> connectionGenesByInnovationNumber = new Dictionary<int, ConnectionGene>();
@@ -141,12 +173,14 @@ namespace Neat
             ConnectionGenes.Add(connectionGene);
         }
 
-        public void AddBasicConnectionGene(NeuronGene neuronGeneFrom, NeuronGene neuronGeneTo)
+        public ConnectionGene AddBasicConnectionGene(NeuronGene neuronGeneFrom, NeuronGene neuronGeneTo)
         {
             string connectionId = "c_" + neuronGeneFrom.Id + "_" + neuronGeneTo.Id;
             int innovationNumber = InnovationManager.Instance.GetInnovationNumber(neuronGeneFrom.Id, neuronGeneTo.Id);
             ConnectionGene connectionGene = new ConnectionGene(connectionId, innovationNumber, true, Utils.RandDouble(Config.minWeightLimit, Config.maxWeightLimit), neuronGeneFrom, neuronGeneTo);
             ConnectionGenes.Add(connectionGene);
+
+            return connectionGene;
         }
 
         public static Genome FromJObject(JObject json)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NeuralNetwork;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,14 +32,13 @@ namespace Neat
             // Crossover
             // The chance for getting selected for crossover linearly increases the
             // better the fitness of a Genome is
-            PerformCrossover(ref populationForNextGeneration);
+            List<Genome> offspring = PerformCrossover(ref populationForNextGeneration);
 
             // Mutation
-            // Perturbs Connection weights with a chance
-            // 
-            PerformMutation(ref populationForNextGeneration);
-
-            // Mutation (Applied to every genome but only with a certain percentage)
+            // - Mutates the children which resulted from crossover
+            // - Creates mutants for the Speciess AmountToGenerateByMutation
+            // - Only elitists are not mutated
+            PerformMutation(ref populationForNextGeneration, offspring);
             
             // Determine species
             // Save to file
@@ -218,15 +218,17 @@ namespace Neat
             return offspring;
         }
                 
-        public List<Genome> PerformMutation(ref List<Genome> populationForNextGeneration)
+        public List<Genome> PerformMutation(ref List<Genome> populationForNextGeneration, List<Genome> offspring)
         {
             List<Genome> mutants = new List<Genome>();
 
-            foreach (Genome genome in populationForNextGeneration)
+            // Mutate the children which resulted from crossover
+            foreach (Genome child in offspring)
             {
-                // Mutate by chance
+                Mutate(child);
             }
 
+            // Create mutants for each Species until their AmountToGenerateByMutation is hit
             foreach (Species species in History.Speciess[History.CurrentGeneration])
             {
                 SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[History.CurrentGeneration];
@@ -241,12 +243,14 @@ namespace Neat
                     mutant.Generation = null;
                     mutant.Species = null;
 
-                    mutant.Mutate();
+                    Mutate(mutant);
 
                     mutants.Add(mutant);
                     populationForNextGeneration.Add(mutant);
                 }
             }
+
+            // Only the elitists are not mutated
 
             return mutants;
         }
@@ -419,16 +423,16 @@ namespace Neat
                 MutateWeights(genome);
             }
 
-            // Mutate Add Connection
-            if (Utils.random.NextDouble() < Config.chanceForNewConnectionMutation)
-            {
-                MutateAddConnection(genome);
-            }
-
             // Mutate Add Neuron
             if (Utils.random.NextDouble() < Config.chanceForNewNeuronMutation)
             {
                 MutateAddNeuron(genome);
+            }
+
+            // Mutate Add Connection
+            if (Utils.random.NextDouble() < Config.chanceForNewConnectionMutation)
+            {
+                MutateAddConnection(genome);
             }
         }
 
@@ -472,7 +476,33 @@ namespace Neat
 
         private void MutateAddNeuron(Genome genome)
         {
+            List<ConnectionGene> copiedConnectionGenes = new List<ConnectionGene>(genome.ConnectionGenes);
 
+            while (copiedConnectionGenes.Count > 0)
+            {
+                ConnectionGene selectedConnectionGene = Utils.RandomListItem(genome.ConnectionGenes, null);
+                if (selectedConnectionGene != null && selectedConnectionGene.IsEnabled)
+                {
+                    // Eligible ConnectionGene found
+                    // Now disable it and create two 
+                    // new ConnectionGenes and a NeuronGene 
+                    // which will be connected by them
+                    NeuronGene originalNeuronGeneFrom = selectedConnectionGene.NeuronGeneFrom;
+                    NeuronGene originalNeuronGeneTo = selectedConnectionGene.NeuronGeneTo;
+
+                    NeuronGene newNeuronGene = new NeuronGene(genome.GetNextNeuronGeneId(NeuronType.Hidden), NeuronType.Hidden);
+                    genome.NeuronGenes.Add(newNeuronGene);
+
+                    ConnectionGene newConnectionGene1 = genome.AddBasicConnectionGene(originalNeuronGeneFrom, newNeuronGene);
+                    ConnectionGene newConnectionGene2 = genome.AddBasicConnectionGene(newNeuronGene, originalNeuronGeneTo);
+
+                    newConnectionGene1.Weight = 1.0;
+                    newConnectionGene2.Weight = selectedConnectionGene.Weight;
+
+                    selectedConnectionGene.IsEnabled = false;
+                    break;
+                }
+            }            
         }
 
         private void MutateWeights(Genome genome)

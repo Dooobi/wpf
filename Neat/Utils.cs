@@ -18,6 +18,10 @@ namespace Neat
 
         public static T RandomListItem<T>(List<T> list, T excludedItem)
         {
+            if (list.Count == 0)
+            {
+                return null;
+            }
             List<T> copiedList = new List<T>(list);
             if (excludedItem != null)
             {
