@@ -325,7 +325,7 @@ namespace Neat
                 numGenomesFromElitism = (int)(speciesTimestamp.Members.Count / Config.genomesFromElitismRatio);
                 numGenomesFromElitism = Math.Min(numGenomesFromElitism, speciesTimestamp.AmountToGenerateForNextGeneration);
 
-                numGenomesFromMutation = (int)((speciesTimestamp.AmountToGenerateForNextGeneration - numGenomesFromElitism) * Config.ratioOfOffspringByMutation);
+                numGenomesFromMutation = (int)((speciesTimestamp.AmountToGenerateForNextGeneration - numGenomesFromElitism) * Config.offspringFromMutationRatio);
                 numGenomesFromCrossover = speciesTimestamp.AmountToGenerateForNextGeneration - (numGenomesFromElitism + numGenomesFromMutation);
 
                 speciesTimestamp.AmountToGenerateByElitism = numGenomesFromElitism;

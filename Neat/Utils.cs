@@ -20,7 +20,7 @@ namespace Neat
         {
             if (list.Count == 0)
             {
-                return null;
+                return default(T);
             }
             List<T> copiedList = new List<T>(list);
             if (excludedItem != null)
