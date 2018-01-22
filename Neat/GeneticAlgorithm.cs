@@ -419,6 +419,59 @@ namespace Neat
                 MutateWeights(genome);
             }
 
+            // Mutate Add Connection
+            if (Utils.random.NextDouble() < Config.chanceForNewConnectionMutation)
+            {
+                MutateAddConnection(genome);
+            }
+
+            // Mutate Add Neuron
+            if (Utils.random.NextDouble() < Config.chanceForNewNeuronMutation)
+            {
+                MutateAddNeuron(genome);
+            }
+        }
+
+        private void MutateAddConnection(Genome genome)
+        {
+            List<NeuronGene> candidatesToConnectFrom = new List<NeuronGene>(genome.NeuronGenes);
+            List<NeuronGene> candidatesToConnectTo;
+
+            while (candidatesToConnectFrom.Count > 0)
+            {
+                // Get a random candidate to connect from
+                NeuronGene candidateToConnectFrom = Utils.RandomListItem(genome.NeuronGenes, null);
+
+                // Find all the candidates to which the candidateToConnectFrom has no Connection yet
+                candidatesToConnectTo = new List<NeuronGene>();
+                foreach (NeuronGene candidateToConnectTo in genome.NeuronGenes)
+                {
+                    if (!CheckForConnectionGeneFromTo(genome, candidateToConnectFrom, candidateToConnectTo))
+                    {
+                        candidatesToConnectTo.Add(candidateToConnectTo);
+                    }
+                }
+                if (candidatesToConnectTo.Count == 0)
+                {
+                    // The selected candidateToConnectFrom has no candidates to connect to
+                    // so remove it from the candidatesToConnectFrom and try with
+                    // another candidateToConnectFrom
+                    candidatesToConnectFrom.Remove(candidateToConnectFrom);
+                }
+                else
+                {
+                    // The selected candidateToConnectFrom has candidates to connect to
+                    // so choose on of them by random and create the ConnectionGene
+                    NeuronGene neuronGeneToConnectTo = Utils.RandomListItem(candidatesToConnectTo, null);
+
+                    genome.AddBasicConnectionGene(candidateToConnectFrom, neuronGeneToConnectTo);
+                    break;
+                }
+            }
+        }
+
+        private void MutateAddNeuron(Genome genome)
+        {
 
         }
 
@@ -633,6 +686,21 @@ namespace Neat
             avgWeightDifference = sumWeightDifference / numMatchingGenes;
 
             return (Config.compatibilityCoefficientNumExcessGenes * numExcessGenes) / numGenesLargerGenome + (Config.compatibilityCoefficientNumDisjointGenes * numDisjointGenes) / numGenesLargerGenome + Config.compatibilityCoefficientAvgWeightDifference * avgWeightDifference;
+        }
+
+        private bool CheckForConnectionGeneFromTo(Genome genome, NeuronGene neuronGeneFrom, NeuronGene neuronGeneTo)
+        {
+            foreach (ConnectionGene connectionGene in genome.ConnectionGenes)
+            {
+                if (connectionGene.NeuronGeneFrom == neuronGeneFrom
+                    && connectionGene.NeuronGeneTo == neuronGeneTo)
+                {
+                    // A ConnectionGene from the neuronGeneFrom to the neuronGeneTo exists
+                    return true;
+                }
+            }
+            // No ConnectionGene from the neuronGeneFrom to the neuronGeneTo exists
+            return false;
         }
     }
 }

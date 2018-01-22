@@ -145,7 +145,7 @@ namespace Neat
         {
             string connectionId = "c_" + neuronGeneFrom.Id + "_" + neuronGeneTo.Id;
             int innovationNumber = InnovationManager.Instance.GetInnovationNumber(neuronGeneFrom.Id, neuronGeneTo.Id);
-            ConnectionGene connectionGene = new ConnectionGene(connectionId, innovationNumber, true, Utils.RandDouble(-1.0, 1.0), neuronGeneFrom, neuronGeneTo);
+            ConnectionGene connectionGene = new ConnectionGene(connectionId, innovationNumber, true, Utils.RandDouble(Config.minWeightLimit, Config.maxWeightLimit), neuronGeneFrom, neuronGeneTo);
             ConnectionGenes.Add(connectionGene);
         }
 

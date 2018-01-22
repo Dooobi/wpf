@@ -15,7 +15,18 @@ namespace Neat
         {
             return random.NextDouble() * (exclusiveUpperBound - inclusiveLowerBound) + inclusiveLowerBound;
         }
-        
+
+        public static T RandomListItem<T>(List<T> list, T excludedItem)
+        {
+            List<T> copiedList = new List<T>(list);
+            if (excludedItem != null)
+            {
+                copiedList.Remove(excludedItem);
+            }
+            int rand = random.Next(copiedList.Count);
+            return copiedList[rand];
+        }
+
         public static void WriteToFile(string filepath, string text, bool endWithNewLine, bool startWithNewLine)
         {
             if (endWithNewLine)
