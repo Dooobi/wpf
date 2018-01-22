@@ -99,9 +99,29 @@ namespace Neat
             }
         }
 
-        public void GenerateNetwork()
+        public void GenerateNetwork(DelegateActivationFunction activationFunction)
         {
+            List<Neuron> neurons = new List<Neuron>();
+            List<Connection> connections = new List<Connection>();
 
+            foreach (NeuronGene neuronGene in NeuronGenes)
+            {
+                neurons.Add(new Neuron(neuronGene.Id, neuronGene.Type));
+            }
+            foreach (ConnectionGene connectionGene in ConnectionGenes)
+            {
+                if (connectionGene.IsEnabled)
+                {
+                    Neuron neuronFrom = neurons.Find(neuron => connectionGene.NeuronGeneFrom.Id == neuron.Id);
+                    Neuron neuronTo = neurons.Find(neuron => connectionGene.NeuronGeneTo.Id == neuron.Id);
+                    Connection connection = new Connection(connectionGene.Id, connectionGene.Weight, neuronFrom, neuronTo);
+                    neuronFrom.OutgoingConnections.Add(connection);
+                    neuronTo.IncomingConnections.Add(connection);
+                    connections.Add(connection);
+                }
+            }
+
+            Network = new Network(neurons, activationFunction);
         }
 
         public string GetNextNeuronGeneId(NeuronType neuronType)

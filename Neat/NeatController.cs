@@ -35,7 +35,7 @@ namespace Neat
 
                 foreach (Genome g in populationForNextGeneration)
                 {
-                    g.GenerateNetwork();
+                    g.GenerateNetwork(ActivationFunction.SigmoidModified);
                     CurrentPopulationBeforeEvaluation.Push(g);
                 }
             }
