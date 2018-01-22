@@ -313,6 +313,7 @@ namespace Neat
         // - CheckInterspeciesCrossover
         // - CalculateCompatibility
         /****************************************************************/
+
         /*
          * Uses the configured minChanceForSelectionToCrossover and maxChanceForSelectionToCrossover
          * to select a Genome from a list of Genomes which is sorted by fitness (lower index = lower fitness)
