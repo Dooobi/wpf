@@ -5,20 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded">
 
-    <Grid Name="myPanel" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto">
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="309" Width="507" Grid.ColumnSpan="3" Margin="10,10,0,0" Grid.RowSpan="3"/>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="MyResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <!--<Window.DataContext>
+        <local:ViewModel/>
+    </Window.DataContext>-->
 
-    </Grid>
+    <ScrollViewer>
+        <Grid x:Name="grid" HorizontalAlignment="Left">
+
+        </Grid>
+    </ScrollViewer>
+        
+    <!--<DataGrid ItemsSource="{Binding Speciess}" FrozenColumnCount="1" AutoGenerateColumns="True" IsReadOnly="True">
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Number" Binding="{Binding Key.Number}"/>
+            <DataGridTextColumn Header="Species 1" Binding="{Binding Value[0].Id}"/>
+        </DataGrid.Columns>
+    </DataGrid>-->
 </Window>

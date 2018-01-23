@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,29 +29,129 @@ namespace WpfApp1
         public MainWindow()
         {
             InitializeComponent();
+            InitGrid();
             Initialize();
+        }
 
-            //TestNetwork();
+        private void InitGrid()
+        {
+            // Column for the Generations
+            ColumnDefinition column = new ColumnDefinition();
+            column.Width = new GridLength(40);
+            grid.ColumnDefinitions.Add(column);
 
-            TestGeneticAlgorithm();
+            // Empty column between Generation and Speciess
+            column = new ColumnDefinition();
+            column.Width = new GridLength(20);
+            grid.ColumnDefinitions.Add(column);
+        }
+
+        private void UpdateGrid()
+        {
+            int numberOfSpeciesColumns = grid.ColumnDefinitions.Count - 2;
+            int numberOfGenerationRows = grid.RowDefinitions.Count;
+
+            int maxNumberOfSpeciesPerGeneration = 0;
+            foreach (List<Species> speciess in History.Speciess.Values)
+            {
+                if (speciess.Count > maxNumberOfSpeciesPerGeneration)
+                {
+                    maxNumberOfSpeciesPerGeneration = speciess.Count;
+                }
+            }
+
+            for (; numberOfSpeciesColumns < maxNumberOfSpeciesPerGeneration; numberOfSpeciesColumns++)
+            {
+                ColumnDefinition column = new ColumnDefinition();
+                column.Width = new GridLength(40);
+
+                grid.ColumnDefinitions.Add(column);
+            }
+
+            for (; numberOfGenerationRows < History.Generations.Count; numberOfGenerationRows++)
+            {
+                Generation generation = History.Generations[numberOfGenerationRows];
+
+                RowDefinition row = new RowDefinition();
+                row.Height = new GridLength(40);
+                grid.RowDefinitions.Add(row);
+
+                AddGenerationButton(generation, numberOfGenerationRows);
+
+                for (int col = 0; col < History.Speciess[generation].Count; col++)
+                {
+                    Species species = History.Speciess[generation][col];
+
+                    AddSpeciesButton(species, numberOfGenerationRows, col + 2);
+                }
+            }
+            //// Create Columns
+            //ColumnDefinition gridCol1 = new ColumnDefinition();
+            //ColumnDefinition gridCol2 = new ColumnDefinition();
+            //ColumnDefinition gridCol3 = new ColumnDefinition();
+            //grid.ColumnDefinitions.Add(gridCol1);
+            //grid.ColumnDefinitions.Add(gridCol2);
+            //grid.ColumnDefinitions.Add(gridCol3);
+
+            //// Create Rows
+            //RowDefinition gridRow1 = new RowDefinition();
+            //gridRow1.Height = new GridLength(45);
+            //RowDefinition gridRow2 = new RowDefinition();
+            //gridRow2.Height = new GridLength(45);
+            //RowDefinition gridRow3 = new RowDefinition();
+            //gridRow3.Height = new GridLength(45);
+            //grid.RowDefinitions.Add(gridRow1);
+            //grid.RowDefinitions.Add(gridRow2);
+            //grid.RowDefinitions.Add(gridRow3);
+
+            //// Add first column header
+            //TextBlock txtBlock1 = new TextBlock();
+            //txtBlock1.Text = "Author Name";
+            //txtBlock1.FontSize = 14;
+            //txtBlock1.FontWeight = FontWeights.Bold;
+            //txtBlock1.Foreground = new SolidColorBrush(Colors.Green);
+            //txtBlock1.VerticalAlignment = VerticalAlignment.Top;
+            //Grid.SetRow(txtBlock1, 0);
+            //Grid.SetColumn(txtBlock1, 0);
+
+            //grid.Children.Add(txtBlock1);
         }
 
         private void Initialize()
         {
+            // Initialize input and correct output for the NeuralNetworks
             inputPatterns = new List<List<double>>();
             inputPatterns.Add(new List<double>(new double[] { 0, 0 }));
             inputPatterns.Add(new List<double>(new double[] { 0, 1 }));
             inputPatterns.Add(new List<double>(new double[] { 1, 0 }));
             inputPatterns.Add(new List<double>(new double[] { 1, 1 }));
             answers = new List<double>(new double[] { 0, 1, 1, 0 });
+        }
 
-            //World myWorld = new World();
-            
-            //myPanel.Children.Add(new Graph(GetGraph()));
-            //myPanel.Children.Add(new Graph(GetGraph()));
+        private void AddGenerationButton(Generation generation, int rowIndex)
+        {
+            Button generationButton = new Button();
+            generationButton.Template = (ControlTemplate)FindResource("ButtonTemplate");
+            generationButton.FontSize = 24;
+            generationButton.FontWeight = FontWeights.Bold;
+            generationButton.Width = 40;
+            generationButton.Content = generation.Number;
+            Grid.SetRow(generationButton, rowIndex);
+            Grid.SetColumn(generationButton, 0);
+            grid.Children.Add(generationButton);
+        }
 
-            //Grid.SetRow(myPanel.Children[0], 1);
-            //Grid.SetRow(myPanel.Children[0], 1);
+        private void AddSpeciesButton(Species species, int rowIndex, int colIndex)
+        {
+            Button speciesButton = new Button();
+            speciesButton.Template = (ControlTemplate)FindResource("ButtonTemplate");
+            speciesButton.FontSize = 24;
+            speciesButton.FontWeight = FontWeights.Bold;
+            speciesButton.Width = 40;
+            speciesButton.Content = species.Id;
+            Grid.SetRow(speciesButton, rowIndex);
+            Grid.SetColumn(speciesButton, colIndex);
+            grid.Children.Add(speciesButton);
         }
 
         private void TestGeneticAlgorithm()
@@ -59,19 +160,38 @@ namespace WpfApp1
 
             // Initialize NeatController
             NeatController neatController = new NeatController();
-
+            bool nextGeneration = true;
             while (History.CurrentGeneration == null || History.CurrentGeneration.Number < 100)
             {
-                if (History.CurrentGeneration == null)
+                if (nextGeneration)
                 {
-                    Console.WriteLine("-- Start Generation {0} --", 1);
+                    if (History.CurrentGeneration == null)
+                    {
+                        Console.WriteLine("-- Start Generation {0} --", 1);
+                    }
+                    else
+                    {
+                        Console.WriteLine("-- Start Generation {0} --", History.CurrentGeneration.Number + 1);
+                    }
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        //Dein Code der synchronisiert zur GUI läuft
+                        UpdateGrid();
+                    });
                 }
+
                 Genome genome = neatController.GetNextGenomeToEvaluate();
 
                 genome.Fitness = EvaluateFitness(genome.Network);
 
-                neatController.SubmitGenomeAfterEvaluation(genome);
+                nextGeneration = neatController.SubmitGenomeAfterEvaluation(genome);
             }
+            Dispatcher.Invoke(() =>
+            {
+                //Dein Code der synchronisiert zur GUI läuft
+                UpdateGrid();
+            });
         }
 
         private double EvaluateFitness(Network network)
@@ -253,6 +373,11 @@ namespace WpfApp1
             neurons.Add(out1);
 
             return neurons;
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            await Task.Run(() => TestGeneticAlgorithm());
         }
     }
 }
