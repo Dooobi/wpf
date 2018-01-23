@@ -33,7 +33,7 @@ namespace NeuralNetwork
         /*
          * This constructor creates a copy of a Network
          */
-        public Network(Network network)
+        public Network(Network network) : this()
         {
             List<Connection> copiedConnections = new List<Connection>();
 
@@ -121,12 +121,6 @@ namespace NeuralNetwork
             hiddenAndOutputNeurons.AddRange(HiddenNeurons);
             hiddenAndOutputNeurons.AddRange(OutputNeurons);
 
-#if DEBUG
-            int updateCounter = 0;
-            string debug = "";
-#endif
-
-
             if (inputs.Count != InputNeurons.Count)
             {
                 throw new Exception(String.Format("Network.Update(): Number of inputs ({0}) is not the same as number of InputNeurons ({1})!", inputs.Count, InputNeurons.Count));
@@ -168,45 +162,13 @@ namespace NeuralNetwork
                     neuron.Output = neuron.NewOutput;
                 }
 
-#if DEBUG
-                updateCounter++;
-                Console.WriteLine("Current Network update cycle: {0}", updateCounter);
-                debug = "";
-                for (int counter = 0; counter < hiddenAndOutputNeurons.Count; counter++)
-                {
-                    if (counter > 0)
-                    {
-                        debug += ", ";
-                    }
-                    debug += String.Format("{0}: {1:0.##}", hiddenAndOutputNeurons[counter].Id, hiddenAndOutputNeurons[counter].Output);
-                }
-                Console.WriteLine("  Output of neurons are: [" + debug + "]");
-#endif
             }
-
-#if DEBUG
-            Console.WriteLine("Network has finished updating after {0} cycles.", updateCounter);
-#endif
 
             // All Outputs have stabilized so the outputs of the OutputNeurons can now be returned
             foreach (Neuron outputNeuron in OutputNeurons)
             {
                 outputs.Add(outputNeuron.Output);
             }
-
-
-#if DEBUG
-            debug = "";
-            for (int counter = 0; counter < hiddenAndOutputNeurons.Count; counter++)
-            {
-                if (counter > 0)
-                {
-                    debug += ", ";
-                }
-                debug += String.Format("{0}: {1:0.##}", hiddenAndOutputNeurons[counter].Id, hiddenAndOutputNeurons[counter].Output);
-            }
-            Console.WriteLine("  Output of neurons are: [" + debug + "]");
-#endif
 
             return outputs;
         }

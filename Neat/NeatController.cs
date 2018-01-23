@@ -28,7 +28,7 @@ namespace Neat
             return CurrentPopulationBeforeEvaluation.Pop();
         }
 
-        public void SubmitGenomeAfterEvaluation(Genome genome)
+        public bool SubmitGenomeAfterEvaluation(Genome genome)
         {
             CurrentPopulationAfterEvaluation.Add(genome);
             
@@ -43,7 +43,12 @@ namespace Neat
                     g.GenerateNetwork(ActivationFunction.SigmoidModified);
                     CurrentPopulationBeforeEvaluation.Push(g);
                 }
+
+                // A new Generation has been created
+                return true;
             }
+            
+            return false;
         }
 
         private void CreateInitialPopulation()
@@ -55,6 +60,8 @@ namespace Neat
             {
                 string id = "g" + generationOfPopulation + ": " + i;
                 Genome genome = new Genome(id, Config.numberOfInputs, Config.numberOfOutputs);
+                genome.SetupInitialNeuronGenes();
+                genome.ConnectAllInputNeuronGenesToAllOutputNeuronGenes();
                 genome.GenerateNetwork(ActivationFunction.SigmoidModified);
                 CurrentPopulationBeforeEvaluation.Push(genome);
             }

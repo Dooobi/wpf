@@ -76,25 +76,33 @@ namespace Neat
         // History.CurrentGeneration is the Generation of the evaluated Population
         private void Speciate(List<Genome> evaluatedPopulation)
         {
-            List<Species> availableSpeciesForThisGeneration;
+            List<Species> availableSpecies;
+            List<Species> availableSpeciesFromPreviousGeneration;
+            List<Species> availableSpeciesFromCurrentGeneration;
             if (History.PreviousGeneration == null)
             {
-                availableSpeciesForThisGeneration = new List<Species>();
+                availableSpeciesFromPreviousGeneration = new List<Species>();
             }
             else
             {
-                availableSpeciesForThisGeneration = new List<Species>(History.Speciess[History.PreviousGeneration]);
+                availableSpeciesFromPreviousGeneration = new List<Species>(History.Speciess[History.PreviousGeneration]);
             }
 
             foreach (Genome genome in evaluatedPopulation)
             {
                 try
                 {
-                    availableSpeciesForThisGeneration.AddRange(History.Speciess[History.CurrentGeneration]);
+                    availableSpeciesFromCurrentGeneration = History.Speciess[History.CurrentGeneration];
                 }
-                catch { }
+                catch
+                {
+                    availableSpeciesFromCurrentGeneration = new List<Species>();
+                }
 
-                foreach (Species species in availableSpeciesForThisGeneration)
+                availableSpecies = new List<Species>(availableSpeciesFromPreviousGeneration);
+                availableSpecies.AddRange(availableSpeciesFromCurrentGeneration);
+
+                foreach (Species species in availableSpecies)
                 {
                     Genome leaderGenome;
                     try
@@ -350,7 +358,7 @@ namespace Neat
             {
                 SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[currentGeneration];
 
-                numGenomesFromElitism = (int)(speciesTimestamp.Members.Count / Config.genomesFromElitismRatio);
+                numGenomesFromElitism = (int)(speciesTimestamp.Members.Count * Config.genomesFromElitismRatio);
                 numGenomesFromElitism = Math.Min(numGenomesFromElitism, speciesTimestamp.AmountToGenerateForNextGeneration);
 
                 numGenomesFromMutation = (int)((speciesTimestamp.AmountToGenerateForNextGeneration - numGenomesFromElitism) * Config.offspringFromMutationRatio);
@@ -366,9 +374,10 @@ namespace Neat
         {
             foreach (Species species in History.Speciess[History.CurrentGeneration])
             {
+                int numberOfMembers = species.SpeciesTimestamps[History.CurrentGeneration].Members.Count;
                 foreach (Genome genome in species.SpeciesTimestamps[History.CurrentGeneration].Members)
                 {
-                    double adjustedFitness = genome.Fitness / species.SpeciesTimestamps[History.CurrentGeneration].Members.Count;
+                    double adjustedFitness = genome.Fitness / numberOfMembers;
                     genome.AdjustedFitness = adjustedFitness;
                 }
             }
@@ -562,6 +571,7 @@ namespace Neat
         private Genome Crossover(Genome parent1, Genome parent2, string idForChild)
         {
             Genome child = new Genome(idForChild, Config.numberOfInputs, Config.numberOfOutputs);
+            child.SetupInitialNeuronGenes();
 
             bool equalFitness = false;
             Genome parentHigherFitness, parentLowerFitness;
@@ -588,8 +598,8 @@ namespace Neat
 
             for (int i = lowestInnovationNumber; i <= highestInnovationNumber; i++)
             {
-                ConnectionGene connectionGeneParentHigherFitness = connectionGenesParentHigherFitness[i];
-                ConnectionGene connectionGeneParentLowerFitness = connectionGenesParentLowerFitness[i];
+                ConnectionGene connectionGeneParentHigherFitness = (connectionGenesParentHigherFitness.ContainsKey(i) ? connectionGenesParentHigherFitness[i] : null);
+                ConnectionGene connectionGeneParentLowerFitness = (connectionGenesParentHigherFitness.ContainsKey(i) ? connectionGenesParentHigherFitness[i] : null);
                 ConnectionGene chosenConnectionGene = null, rejectedConnectionGene = null;
                 ConnectionGene connectionGeneChild;
 
@@ -707,18 +717,25 @@ namespace Neat
             int numGenesLargerGenome, numExcessGenes = 0, numDisjointGenes = 0, numMatchingGenes = 0;
             double sumWeightDifference = 0.0, avgWeightDifference;
 
-            Dictionary<int, ConnectionGene> genesByInnovationNumber1 = genome1.GetConnectionGenesByInnovationNumber();
-            Dictionary<int, ConnectionGene> genesByInnovationNumber2 = genome1.GetConnectionGenesByInnovationNumber();
-            int smallerMaxInnovationNumber = Math.Min(genesByInnovationNumber1.Keys.Max(), genesByInnovationNumber2.Keys.Max());
-            int higherMaxInnovationNumber = Math.Max(genesByInnovationNumber1.Keys.Max(), genesByInnovationNumber2.Keys.Max());
+            Dictionary<int, ConnectionGene> connectionGenesByInnovationNumber1 = genome1.GetConnectionGenesByInnovationNumber();
+            Dictionary<int, ConnectionGene> connectionGenesByInnovationNumber2 = genome2.GetConnectionGenesByInnovationNumber();
+            int smallerMaxInnovationNumber = Math.Min(connectionGenesByInnovationNumber1.Keys.Max(), connectionGenesByInnovationNumber2.Keys.Max());
+            int higherMaxInnovationNumber = Math.Max(connectionGenesByInnovationNumber1.Keys.Max(), connectionGenesByInnovationNumber2.Keys.Max());
 
             for (int i = 1; i <= higherMaxInnovationNumber; i++)
             {
-                ConnectionGene gene1 = genesByInnovationNumber1[i];
-                ConnectionGene gene2 = genesByInnovationNumber2[i];
+                ConnectionGene connectionGene1 = null, connectionGene2 = null;
+                if (connectionGenesByInnovationNumber1.ContainsKey(i))
+                {
+                    connectionGene1 = connectionGenesByInnovationNumber1[i];
+                }
+                if (connectionGenesByInnovationNumber2.ContainsKey(i))
+                {
+                    connectionGene2 = connectionGenesByInnovationNumber2[i];
+                }
 
-                if (gene1 != null && gene2 == null
-                    || gene1 == null && gene2 != null)
+                if (connectionGene1 != null && connectionGene2 == null
+                    || connectionGene1 == null && connectionGene2 != null)
                 {
                     // The connectionGene is either disjoint or excess
                     if (i > smallerMaxInnovationNumber)
@@ -732,11 +749,11 @@ namespace Neat
                         numDisjointGenes++;
                     }
                 }
-                else if (gene1 != null && gene2 != null)
+                else if (connectionGene1 != null && connectionGene2 != null)
                 {
                     // The connectionGenes are matching
                     numMatchingGenes++;
-                    sumWeightDifference += Math.Abs(gene1.Weight - gene2.Weight);
+                    sumWeightDifference += Math.Abs(connectionGene1.Weight - connectionGene2.Weight);
                 }
             }
 

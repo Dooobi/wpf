@@ -35,19 +35,29 @@ namespace ConsoleApp1
 
             // Initialize NeatController
             NeatController neatController = new NeatController();
-
+            bool nextGeneration = true;
             while (History.CurrentGeneration == null || History.CurrentGeneration.Number < 100)
             {
-                if (History.CurrentGeneration == null)
+                if (nextGeneration)
                 {
-                    Console.WriteLine("-- Start Generation {0} --", 1);
+                    if (History.CurrentGeneration == null)
+                    {
+                        Console.WriteLine("-- Start Generation {0} --", 1);
+                    }
+                    else
+                    {
+                        Console.WriteLine("-- Start Generation {0} --", History.CurrentGeneration.Number);
+                    }
                 }
+                
                 Genome genome = neatController.GetNextGenomeToEvaluate();
 
                 genome.Fitness = EvaluateFitness(genome.Network);
-
-                neatController.SubmitGenomeAfterEvaluation(genome);
+                
+                nextGeneration = neatController.SubmitGenomeAfterEvaluation(genome);
             }
+
+            Console.Read();
         }
 
         private double EvaluateFitness(Network network)

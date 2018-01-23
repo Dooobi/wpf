@@ -20,33 +20,16 @@ namespace Neat
             NextInnovationNumber = 1;
         }
 
-        public InnovationManager(List<NeuronGene> startNeuronGenes, List<ConnectionGene> startConnectionGenes) : this()
+        public int GetInnovationNumber(string neuronGeneFromId, string neuronGeneToId)
         {
-            // Add the NeuronGenes
-            foreach (NeuronGene neuronGene in startNeuronGenes)
+            Innovation foundInnovation = Innovations.Find(innovation => innovation.NeuronGeneFromId == neuronGeneFromId && innovation.NeuronGeneToId == neuronGeneToId);
+            if (foundInnovation == null)
             {
-                Innovations.Add(new Innovation());
+                foundInnovation = new Innovation(NextInnovationNumber++, neuronGeneFromId, neuronGeneToId);
+                Innovations.Add(foundInnovation);
             }
 
-            // Add the ConnectionGenes
-            foreach (ConnectionGene connectionGene in startConnectionGenes)
-            {
-                Innovations.Add(new Innovation());
-            }
-        }
-
-        public int GetInnovationNumber(string neuronGeneFromId, string neuronGeneToId) {
-
-            foreach (Innovation innovation in Innovations)
-            {
-                if (innovation.NeuronGeneFromId == neuronGeneFromId
-                    && innovation.NeuronGeneToId == neuronGeneToId)
-                {
-                    return innovation.InnovationNumber;
-                }
-            }
-
-            return NextInnovationNumber++;
+            return foundInnovation.InnovationNumber;
         }
     }
 }

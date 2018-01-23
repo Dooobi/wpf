@@ -49,7 +49,7 @@ namespace Neat
 
         public void AddGenome(Genome genome)
         {
-            if (PopulationBySpecies[genome.Species] == null)
+            if (!PopulationBySpecies.ContainsKey(genome.Species))
             {
                 PopulationBySpecies[genome.Species] = new List<Genome>();
             }

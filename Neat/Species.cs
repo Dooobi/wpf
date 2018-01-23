@@ -40,12 +40,16 @@ namespace Neat
          */
         public void AddGenomeAndUpdateSpecies(Genome genome)
         {
-            SpeciesTimestamp speciesTimestamp = SpeciesTimestamps[genome.Generation];
-            if (speciesTimestamp == null)
+            SpeciesTimestamp speciesTimestamp;
+            if (!SpeciesTimestamps.ContainsKey(genome.Generation))
             {
                 speciesTimestamp = new SpeciesTimestamp(this);
                 SpeciesTimestamps[genome.Generation] = speciesTimestamp;
                 speciesTimestamp.Leader = genome;
+            }
+            else
+            {
+                speciesTimestamp = SpeciesTimestamps[genome.Generation];
             }
 
             speciesTimestamp.Members.Add(genome);

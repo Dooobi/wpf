@@ -66,7 +66,10 @@ namespace Neat
             Id = id;
             NumberOfInputs = numberOfInputs;
             NumberOfOutputs = numberOfOutputs;
+        }
 
+        public void SetupInitialNeuronGenes()
+        {
             // Create input NeuronGenes
             for (int i = 0; i < NumberOfInputs; i++)
             {
@@ -77,23 +80,20 @@ namespace Neat
             NeuronGenes.Add(new NeuronGene("bias", NeuronType.Bias));
 
             // Create output NeuronGenes
-            for (int i = 0; i < numberOfOutputs; i++)
+            for (int i = 0; i < NumberOfOutputs; i++)
             {
                 NeuronGenes.Add(new NeuronGene("out" + i + 1, NeuronType.Output));
             }
+        }
 
+        public void ConnectAllInputNeuronGenesToAllOutputNeuronGenes()
+        {
             // Create the ConnectionGenes
             // Go through every input NeuronGene and the bias NeuronGene
-            for (int inputIndex = 0; inputIndex < numberOfInputs + 1; inputIndex++)
+            foreach (NeuronGene neuronGeneFrom in NeuronGenes.FindAll(neuronGene => (neuronGene.Type == NeuronType.Input || neuronGene.Type == NeuronType.Bias)))
             {
-                // For every input NeuronGene and the bias NeuronGene:
-                //  Go through every output NeuronGene
-                for (int outputIndex = 0; outputIndex < numberOfOutputs; outputIndex++)
+                foreach (NeuronGene neuronGeneTo in NeuronGenes.FindAll(neuronGene => neuronGene.Type == NeuronType.Output))
                 {
-                    // And connect the input/bias NeuronGene with the output NeuronGene
-                    NeuronGene neuronGeneFrom = NeuronGenes[inputIndex];
-                    NeuronGene neuronGeneTo = NeuronGenes[outputIndex + numberOfInputs + 1];
-
                     AddBasicConnectionGene(neuronGeneFrom, neuronGeneTo);
                 }
             }
@@ -186,7 +186,7 @@ namespace Neat
                 neuronGeneFrom = new NeuronGene(neuronGeneFromId, connectionGene.NeuronGeneFrom.Type);
                 NeuronGenes.Add(neuronGeneFrom);
             }
-            if (neuronGeneFrom == null)
+            if (neuronGeneTo == null)
             {
                 neuronGeneTo = new NeuronGene(neuronGeneToId, connectionGene.NeuronGeneTo.Type);
                 NeuronGenes.Add(neuronGeneTo);
