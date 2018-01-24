@@ -29,6 +29,18 @@ namespace Neat
             Leader = Members[randomIndex];
         }
 
+        public double CalculateAverageFitness()
+        {
+            double sumFitness = 0.0;
+
+            foreach (Genome genome in Members)
+            {
+                sumFitness += genome.Fitness;
+            }
+
+            return sumFitness / Members.Count;
+        }
+
         public double CalculateAverageAdjustedFitness()
         {
             double sumAdjustedFitness = 0.0;

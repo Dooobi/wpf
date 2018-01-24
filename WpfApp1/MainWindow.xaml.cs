@@ -101,12 +101,11 @@ namespace WpfApp1
 
         private void AddGenerationButton(Generation generation, int rowIndex)
         {
-            Button generationButton = new Button();
-            generationButton.Template = (ControlTemplate)FindResource("ButtonTemplate");
-            generationButton.FontSize = 24;
-            generationButton.FontWeight = FontWeights.Bold;
-            generationButton.Width = 40;
-            generationButton.Content = generation.Number;
+            RoundButton generationButton = new RoundButton();
+            generationButton.Color = Brushes.CornflowerBlue;
+            generationButton.Diameter = 40;
+            generationButton.FontSize = generationButton.Diameter / 3;
+            generationButton.Text = generation.Number + "";
             Grid.SetRow(generationButton, rowIndex);
             Grid.SetColumn(generationButton, 0);
             grid.Children.Add(generationButton);
@@ -114,15 +113,14 @@ namespace WpfApp1
 
         private void AddSpeciesButton(SpeciesTimestamp speciesTimestamp, int rowIndex, int colIndex)
         {
-            double size = (speciesTimestamp.Members.Count / Config.populationSize);
-            Button speciesButton = new Button();
-            speciesButton.Template = (ControlTemplate)FindResource("ButtonTemplate");
-            speciesButton.Background = Brushes.Black;
-            speciesButton.FontSize = 24;
-            speciesButton.FontWeight = FontWeights.Bold;
-            speciesButton.Width = size * 40;
-            speciesButton.Height = size * 40;
-            speciesButton.Content = speciesTimestamp.Species.Id;
+            double size = ((double)speciesTimestamp.Members.Count / Config.populationSize);
+            RoundButton speciesButton = new RoundButton();
+            double hue = Utils.Map(speciesTimestamp.CalculateAverageFitness(), 0.0, (double)16.0, 0.0, 110.0);
+            Brush brush = new SolidColorBrush(Utils.HSBtoRGB(hue, 255.0, 255.0, 255.0));
+            speciesButton.Color = brush;
+            speciesButton.Diameter = size * 40;
+            speciesButton.FontSize = speciesButton.Diameter / 3;
+            speciesButton.Text = speciesTimestamp.Species.Id;
             Grid.SetRow(speciesButton, rowIndex);
             Grid.SetColumn(speciesButton, colIndex);
             grid.Children.Add(speciesButton);
@@ -139,6 +137,12 @@ namespace WpfApp1
             {
                 if (nextGeneration)
                 {
+                    if (History.CurrentGeneration != null) {
+                        foreach (Species species in History.Speciess[History.CurrentGeneration])
+                        {
+                            Console.WriteLine(" {0}: {1}", species.Id, species.SpeciesTimestamps[History.CurrentGeneration].CalculateAverageFitness());
+                        }
+                    }
                     if (History.CurrentGeneration == null)
                     {
                         Console.WriteLine("-- Start Generation {0} --", 1);
@@ -156,7 +160,6 @@ namespace WpfApp1
                 }
 
                 Genome genome = neatController.GetNextGenomeToEvaluate();
-
                 genome.Fitness = EvaluateFitness(genome.Network);
 
                 nextGeneration = neatController.SubmitGenomeAfterEvaluation(genome);
@@ -167,7 +170,7 @@ namespace WpfApp1
                 UpdateGrid();
             });
 
-            Console.WriteLine("  highestCompatibilityValue: {0}", Stats.highestCompatibilityValue);
+            //Console.WriteLine("  highestCompatibilityValue: {0}", Stats.highestCompatibilityValue);
         }
 
         private double EvaluateFitness(Network network)
@@ -355,5 +358,6 @@ namespace WpfApp1
         {
             await Task.Run(() => TestGeneticAlgorithm());
         }
+        
     }
 }

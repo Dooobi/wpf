@@ -18,11 +18,15 @@
     <!--<Window.DataContext>
         <local:ViewModel/>
     </Window.DataContext>-->
-
+    
     <ScrollViewer>
-        <Grid x:Name="grid" HorizontalAlignment="Left">
+        <StackPanel Orientation="Vertical">
+            <local:RoundButton Color="Green" Text="ABC" Diameter="40"/>
+            <local:TileBlock LeftBlockBackground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" CentralBlockBackground="Black" RightBlockBackground="Red" Width="80" Height="100" />
+            <Grid x:Name="grid" HorizontalAlignment="Left">
 
-        </Grid>
+            </Grid>
+        </StackPanel>
     </ScrollViewer>
         
     <!--<DataGrid ItemsSource="{Binding Speciess}" FrozenColumnCount="1" AutoGenerateColumns="True" IsReadOnly="True">

@@ -7,7 +7,7 @@
             <Ellipse x:Name = "ButtonEllipse" Height = "Auto" Width = "Auto" >
 
                 <Ellipse.Fill>
-                    <SolidColorBrush Opacity="0.5" Color="Bisque"/>
+                    <SolidColorBrush Opacity="0.5" Color="{TemplateBinding Control.Background}"/>
                 </Ellipse.Fill>
 
             </Ellipse>

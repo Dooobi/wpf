@@ -2,6 +2,7 @@
 using NeuralNetwork;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,11 +14,13 @@ namespace WpfApp1
     {
         private List<List<double>> inputPatterns;
         private List<double> answers;
+        public Brush Colo { get; set; }
 
         public ViewModel()
         {
             Initialize();
-            TestGeneticAlgorithm();
+            //TestGeneticAlgorithm();
+            Colo = Brushes.Red;
         }
 
         private void Initialize()

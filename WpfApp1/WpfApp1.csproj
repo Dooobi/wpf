@@ -69,6 +69,9 @@
     <Compile Include="RoundButton.xaml.cs">
       <DependentUpon>RoundButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TileBlock.xaml.cs">
+      <DependentUpon>TileBlock.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Unit.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="ViewModel.cs" />
@@ -98,6 +101,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RoundButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TileBlock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
