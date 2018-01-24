@@ -120,6 +120,11 @@ namespace Neat
 
                     double compatibility = CalculateCompatibility(genome, leaderGenome);
 
+                    if (compatibility > Stats.highestCompatibilityValue)
+                    {
+                        Stats.highestCompatibilityValue = compatibility;
+                    }
+
                     if (compatibility <= Config.compatibilityThreshold)
                     {
                         genome.Species = species;

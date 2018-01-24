@@ -81,40 +81,11 @@ namespace WpfApp1
                 for (int col = 0; col < History.Speciess[generation].Count; col++)
                 {
                     Species species = History.Speciess[generation][col];
+                    SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[generation];
 
-                    AddSpeciesButton(species, numberOfGenerationRows, col + 2);
+                    AddSpeciesButton(speciesTimestamp, numberOfGenerationRows, col + 2);
                 }
             }
-            //// Create Columns
-            //ColumnDefinition gridCol1 = new ColumnDefinition();
-            //ColumnDefinition gridCol2 = new ColumnDefinition();
-            //ColumnDefinition gridCol3 = new ColumnDefinition();
-            //grid.ColumnDefinitions.Add(gridCol1);
-            //grid.ColumnDefinitions.Add(gridCol2);
-            //grid.ColumnDefinitions.Add(gridCol3);
-
-            //// Create Rows
-            //RowDefinition gridRow1 = new RowDefinition();
-            //gridRow1.Height = new GridLength(45);
-            //RowDefinition gridRow2 = new RowDefinition();
-            //gridRow2.Height = new GridLength(45);
-            //RowDefinition gridRow3 = new RowDefinition();
-            //gridRow3.Height = new GridLength(45);
-            //grid.RowDefinitions.Add(gridRow1);
-            //grid.RowDefinitions.Add(gridRow2);
-            //grid.RowDefinitions.Add(gridRow3);
-
-            //// Add first column header
-            //TextBlock txtBlock1 = new TextBlock();
-            //txtBlock1.Text = "Author Name";
-            //txtBlock1.FontSize = 14;
-            //txtBlock1.FontWeight = FontWeights.Bold;
-            //txtBlock1.Foreground = new SolidColorBrush(Colors.Green);
-            //txtBlock1.VerticalAlignment = VerticalAlignment.Top;
-            //Grid.SetRow(txtBlock1, 0);
-            //Grid.SetColumn(txtBlock1, 0);
-
-            //grid.Children.Add(txtBlock1);
         }
 
         private void Initialize()
@@ -141,14 +112,17 @@ namespace WpfApp1
             grid.Children.Add(generationButton);
         }
 
-        private void AddSpeciesButton(Species species, int rowIndex, int colIndex)
+        private void AddSpeciesButton(SpeciesTimestamp speciesTimestamp, int rowIndex, int colIndex)
         {
+            double size = (speciesTimestamp.Members.Count / Config.populationSize);
             Button speciesButton = new Button();
             speciesButton.Template = (ControlTemplate)FindResource("ButtonTemplate");
+            speciesButton.Background = Brushes.Black;
             speciesButton.FontSize = 24;
             speciesButton.FontWeight = FontWeights.Bold;
-            speciesButton.Width = 40;
-            speciesButton.Content = species.Id;
+            speciesButton.Width = size * 40;
+            speciesButton.Height = size * 40;
+            speciesButton.Content = speciesTimestamp.Species.Id;
             Grid.SetRow(speciesButton, rowIndex);
             Grid.SetColumn(speciesButton, colIndex);
             grid.Children.Add(speciesButton);
@@ -192,6 +166,8 @@ namespace WpfApp1
                 //Dein Code der synchronisiert zur GUI läuft
                 UpdateGrid();
             });
+
+            Console.WriteLine("  highestCompatibilityValue: {0}", Stats.highestCompatibilityValue);
         }
 
         private double EvaluateFitness(Network network)
@@ -205,7 +181,7 @@ namespace WpfApp1
 
                 totalErrorDiff += Math.Abs(output[0] - answer);
             }
-            return Math.Sqrt(4.0 - totalErrorDiff);
+            return Math.Pow(4.0 - totalErrorDiff, 2);
         }
 
         private void TestNetwork()
