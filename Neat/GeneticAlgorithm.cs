@@ -90,12 +90,12 @@ namespace Neat
 
             foreach (Genome genome in evaluatedPopulation)
             {
-                try
+                if (History.Speciess.ContainsKey(History.CurrentGeneration))
                 {
                     availableSpeciesFromCurrentGeneration = History.Speciess[History.CurrentGeneration];
                 }
-                catch
-                {
+                else
+                { 
                     availableSpeciesFromCurrentGeneration = new List<Species>();
                 }
 
@@ -105,12 +105,13 @@ namespace Neat
                 foreach (Species species in availableSpecies)
                 {
                     Genome leaderGenome;
-                    try
+
+                    if (History.PreviousGeneration != null && species.SpeciesTimestamps.ContainsKey(History.PreviousGeneration))
                     {
                         // Take the leader of this Species from the previous Generation
                         leaderGenome = species.SpeciesTimestamps[History.PreviousGeneration].Leader;
                     }
-                    catch
+                    else
                     {
                         // If the Species was created during this Epoch there won't be a
                         // leader of this Species for the previous Generation.
@@ -134,6 +135,7 @@ namespace Neat
                         {
                             History.Speciess[History.CurrentGeneration].Add(species);
                         }
+                        break;
                     }
                 }
 
@@ -141,14 +143,15 @@ namespace Neat
                 {
                     // Genome is not compatible with any existing species -> create a new species
                     string speciesId;
-                    try
+                    if (History.Speciess.ContainsKey(History.CurrentGeneration))
                     {
                         speciesId = "g" + History.CurrentGeneration.Number + "s" + (History.Speciess[History.CurrentGeneration].Count + 1);
                     }
-                    catch
+                    else
                     {
                         speciesId = "g" + History.CurrentGeneration.Number + "s" + 1;
                     }
+
                     Species newSpecies = new Species(speciesId);
                     SpeciesTimestamp speciesTimestamp = new SpeciesTimestamp(newSpecies);
                     newSpecies.SpeciesTimestamps[History.CurrentGeneration] = speciesTimestamp;
@@ -217,7 +220,7 @@ namespace Neat
                 // Until the amount to generate by crossover is reached by that Species
                 for (int i = 0; i < speciesTimestamp.AmountToGenerateByCrossover; i++) { 
 
-                    bool isInterspeciesCrossover = CheckInterspeciesCrossover();
+                    bool isInterspeciesCrossover = CheckInterspeciesCrossover() || speciesTimestamp.Members.Count < 2;
 
                     // To allow crossover either
                     //  the Species needs at least 2 members 
@@ -252,6 +255,12 @@ namespace Neat
 
                         offspring.Add(child);
                         populationForNextGeneration.Add(child);
+                    }
+                    else
+                    {
+                        // Crossover is not possible because the Species doesn't have at least 2 members
+                        // and interspecies crossover is not active -> Mutate instead
+                        //speciesTimestamp.AmountToGenerateByMutation++;
                     }
                 }
             }
@@ -373,6 +382,13 @@ namespace Neat
                 speciesTimestamp.AmountToGenerateByCrossover = numGenomesFromCrossover;
                 speciesTimestamp.AmountToGenerateByMutation = numGenomesFromMutation;
             }
+
+            foreach (Species species in speciesOfThisGeneration)
+            {
+                SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[currentGeneration];
+                int num = speciesTimestamp.AmountToGenerateByCrossover + speciesTimestamp.AmountToGenerateByElitism + speciesTimestamp.AmountToGenerateByMutation;
+                Console.WriteLine(" {0} generates {1}/{2} genomes.", speciesTimestamp.Species.Id, num, speciesTimestamp.AmountToGenerateForNextGeneration);
+            }
         }
 
         private void AdjustFitness()
@@ -412,6 +428,10 @@ namespace Neat
             }
 
             int highestIndex = actuallyAvailableGenomes.Count - 1;
+            if (highestIndex == 0)
+            {
+                return availableGenomes[0];
+            }
             double gradientOfChanceForSelection = (Config.maxChanceForSelectionToCrossover - Config.minChanceForSelectionToCrossover) / highestIndex;
             double rand = Utils.RandDouble(Config.minChanceForSelectionToCrossover, Config.maxChanceForSelectionToCrossover);
 
@@ -438,8 +458,12 @@ namespace Neat
         private Genome SelectGenomeForMutation(List<Genome> availableGenomes)
         {
             int highestIndex = availableGenomes.Count - 1;
-            double gradientOfChanceForSelection = (Config.maxChanceForSelectionToCrossover - Config.minChanceForSelectionToCrossover) / highestIndex;
-            double rand = Utils.RandDouble(Config.minChanceForSelectionToCrossover, Config.maxChanceForSelectionToCrossover);
+            if (highestIndex == 0)
+            {
+                return availableGenomes[0];
+            }
+            double gradientOfChanceForSelection = (Config.maxChanceForSelectionToMutate - Config.minChanceForSelectionToMutate) / highestIndex;
+            double rand = Utils.RandDouble(Config.minChanceForSelectionToMutate, Config.maxChanceForSelectionToMutate);
 
             // Go through the list of genomes from best to worst (highest chance to lowest chance)
             // and check if it has been selected by the random number

@@ -22,6 +22,7 @@ namespace WpfApp1
     {
         public RoundButton()
         {
+            FontSize = 0.1;
             InitializeComponent();
         }
 

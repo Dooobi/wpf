@@ -118,8 +118,8 @@ namespace WpfApp1
             double hue = Utils.Map(speciesTimestamp.CalculateAverageFitness(), 0.0, (double)16.0, 0.0, 110.0);
             Brush brush = new SolidColorBrush(Utils.HSBtoRGB(hue, 255.0, 255.0, 255.0));
             speciesButton.Color = brush;
-            speciesButton.Diameter = size * 40;
-            speciesButton.FontSize = speciesButton.Diameter / 3;
+            speciesButton.Diameter = Math.Max(size * 40, 5);
+            speciesButton.FontSize = speciesButton.Diameter / 3 + 0.1;
             speciesButton.Text = speciesTimestamp.Species.Id;
             Grid.SetRow(speciesButton, rowIndex);
             Grid.SetColumn(speciesButton, colIndex);
