@@ -23,6 +23,12 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
+        private double generationDiameter = 60;
+        private double maxSpeciesDiameter = 60;
+        private double minSpeciesDiameter = 5;
+
+        private TextBlock headerGeneration, headerSpecies;
+
         private List<List<double>> inputPatterns;
         private List<double> answers;
 
@@ -35,21 +41,53 @@ namespace WpfApp1
 
         private void InitGrid()
         {
+            // Init headers
+            headerGeneration = new TextBlock();
+            headerGeneration.FontSize = 18;
+            headerGeneration.TextAlignment = TextAlignment.Center;
+            headerGeneration.Text = "Gen.";
+            headerGeneration.Foreground = Brushes.White;
+
+            headerSpecies = new TextBlock();
+            headerSpecies.FontSize = 18;
+            headerSpecies.TextAlignment = TextAlignment.Justify;
+            headerSpecies.Text = "S p e c i e s";
+            headerSpecies.Foreground = Brushes.White;
+
             // Column for the Generations
             ColumnDefinition column = new ColumnDefinition();
-            column.Width = new GridLength(40);
+            column.Width = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
             grid.ColumnDefinitions.Add(column);
 
             // Empty column between Generation and Speciess
             column = new ColumnDefinition();
             column.Width = new GridLength(20);
             grid.ColumnDefinitions.Add(column);
+
+            // Start with one Species column
+            column = new ColumnDefinition();
+            column.Width = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
+            grid.ColumnDefinitions.Add(column);
+
+            // Row for the headers
+            RowDefinition row = new RowDefinition();
+            row.Height = new GridLength(40);
+            grid.RowDefinitions.Add(row);
+
+            // Add headers
+            Grid.SetRow(headerGeneration, 0);
+            Grid.SetColumn(headerGeneration, 0);
+            grid.Children.Add(headerGeneration);
+
+            Grid.SetRow(headerSpecies, 0);
+            Grid.SetColumn(headerSpecies, 2);
+            grid.Children.Add(headerSpecies);
         }
 
         private void UpdateGrid()
         {
             int numberOfSpeciesColumns = grid.ColumnDefinitions.Count - 2;
-            int numberOfGenerationRows = grid.RowDefinitions.Count;
+            int numberOfGenerationRows = grid.RowDefinitions.Count - 1;
 
             int maxNumberOfSpeciesPerGeneration = 0;
             foreach (List<Species> speciess in History.Speciess.Values)
@@ -63,9 +101,12 @@ namespace WpfApp1
             for (; numberOfSpeciesColumns < maxNumberOfSpeciesPerGeneration; numberOfSpeciesColumns++)
             {
                 ColumnDefinition column = new ColumnDefinition();
-                column.Width = new GridLength(40);
+                column.Width = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
 
                 grid.ColumnDefinitions.Add(column);
+
+                Grid.SetColumnSpan(headerSpecies, numberOfSpeciesColumns + 1);
+                headerSpecies.Width = numberOfSpeciesColumns * Math.Max(generationDiameter, maxSpeciesDiameter);
             }
 
             for (; numberOfGenerationRows < History.Generations.Count; numberOfGenerationRows++)
@@ -73,17 +114,17 @@ namespace WpfApp1
                 Generation generation = History.Generations[numberOfGenerationRows];
 
                 RowDefinition row = new RowDefinition();
-                row.Height = new GridLength(40);
+                row.Height = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
                 grid.RowDefinitions.Add(row);
 
-                AddGenerationButton(generation, numberOfGenerationRows);
+                AddGenerationButton(generation, numberOfGenerationRows + 1);
 
                 for (int col = 0; col < History.Speciess[generation].Count; col++)
                 {
                     Species species = History.Speciess[generation][col];
                     SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[generation];
 
-                    AddSpeciesButton(speciesTimestamp, numberOfGenerationRows, col + 2);
+                    AddSpeciesButton(speciesTimestamp, numberOfGenerationRows + 1, col + 2);
                 }
             }
         }
@@ -102,10 +143,12 @@ namespace WpfApp1
         private void AddGenerationButton(Generation generation, int rowIndex)
         {
             RoundButton generationButton = new RoundButton();
+
             generationButton.Color = Brushes.CornflowerBlue;
-            generationButton.Diameter = 40;
+            generationButton.Diameter = generationDiameter;
             generationButton.FontSize = generationButton.Diameter / 3;
             generationButton.Text = generation.Number + "";
+            
             Grid.SetRow(generationButton, rowIndex);
             Grid.SetColumn(generationButton, 0);
             grid.Children.Add(generationButton);
@@ -114,16 +157,18 @@ namespace WpfApp1
         private void AddSpeciesButton(SpeciesTimestamp speciesTimestamp, int rowIndex, int colIndex)
         {
             double areaFactor = ((double)speciesTimestamp.Members.Count / Config.populationSize);
-            double maxArea = Math.Pow(20, 2) * Math.PI;
-            double adjustedArea = Math.Max(maxArea * 0.1, maxArea * areaFactor);
+            double maxArea = Math.Pow(maxSpeciesDiameter/2.0, 2) * Math.PI;
+            double adjustedArea = Math.Max(minSpeciesDiameter, maxArea * areaFactor);
             double diameter = Math.Sqrt(adjustedArea / Math.PI) * 2;
+
             RoundButton speciesButton = new RoundButton();
             double hue = Utils.Map(speciesTimestamp.CalculateAverageFitness(), 0.0, (double)16.0, 0.0, 110.0);
             Brush brush = new SolidColorBrush(Utils.HSBtoRGB(hue, 255.0, 255.0, 255.0));
             speciesButton.Color = brush;
             speciesButton.Diameter = diameter;
-            speciesButton.FontSize = speciesButton.Diameter / 3 + 0.1;
+            speciesButton.FontSize = speciesButton.Diameter / 3.0 + 0.1;
             speciesButton.Text = speciesTimestamp.Species.Id;
+
             Grid.SetRow(speciesButton, rowIndex);
             Grid.SetColumn(speciesButton, colIndex);
             grid.Children.Add(speciesButton);
@@ -359,6 +404,7 @@ namespace WpfApp1
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            Thread.Sleep(1000);
             await Task.Run(() => TestGeneticAlgorithm());
         }
         

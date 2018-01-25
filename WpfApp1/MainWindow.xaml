@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="525" Loaded="Window_Loaded">
+        Title="MainWindow" Height="900" Width="525" Loaded="Window_Loaded"
+        Background="#222222">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -14,21 +15,18 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    
+
     <!--<Window.DataContext>
         <local:ViewModel/>
     </Window.DataContext>-->
-    
+
     <ScrollViewer>
         <StackPanel Orientation="Vertical">
-            <local:RoundButton Color="Green" Text="ABC" Diameter="40"/>
-            <local:TileBlock LeftBlockBackground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" CentralBlockBackground="Black" RightBlockBackground="Red" Width="80" Height="100" />
             <Grid x:Name="grid" HorizontalAlignment="Left">
-
             </Grid>
         </StackPanel>
     </ScrollViewer>
-        
+
     <!--<DataGrid ItemsSource="{Binding Speciess}" FrozenColumnCount="1" AutoGenerateColumns="True" IsReadOnly="True">
         <DataGrid.Columns>
             <DataGridTextColumn Header="Number" Binding="{Binding Key.Number}"/>
