@@ -424,13 +424,13 @@ namespace Neat
             List<Genome> actuallyAvailableGenomes = new List<Genome>(availableGenomes);
             if (excludedFromAvailableGenomes != null)
             {
-                availableGenomes.Remove(excludedFromAvailableGenomes);
+                actuallyAvailableGenomes.Remove(excludedFromAvailableGenomes);
             }
 
             int highestIndex = actuallyAvailableGenomes.Count - 1;
             if (highestIndex == 0)
             {
-                return availableGenomes[0];
+                return actuallyAvailableGenomes[0];
             }
             double gradientOfChanceForSelection = (Config.maxChanceForSelectionToCrossover - Config.minChanceForSelectionToCrossover) / highestIndex;
             double rand = Utils.RandDouble(Config.minChanceForSelectionToCrossover, Config.maxChanceForSelectionToCrossover);

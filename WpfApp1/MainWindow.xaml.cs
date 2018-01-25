@@ -113,12 +113,15 @@ namespace WpfApp1
 
         private void AddSpeciesButton(SpeciesTimestamp speciesTimestamp, int rowIndex, int colIndex)
         {
-            double size = ((double)speciesTimestamp.Members.Count / Config.populationSize);
+            double areaFactor = ((double)speciesTimestamp.Members.Count / Config.populationSize);
+            double maxArea = Math.Pow(20, 2) * Math.PI;
+            double adjustedArea = Math.Max(maxArea * 0.1, maxArea * areaFactor);
+            double diameter = Math.Sqrt(adjustedArea / Math.PI) * 2;
             RoundButton speciesButton = new RoundButton();
             double hue = Utils.Map(speciesTimestamp.CalculateAverageFitness(), 0.0, (double)16.0, 0.0, 110.0);
             Brush brush = new SolidColorBrush(Utils.HSBtoRGB(hue, 255.0, 255.0, 255.0));
             speciesButton.Color = brush;
-            speciesButton.Diameter = Math.Max(size * 40, 5);
+            speciesButton.Diameter = diameter;
             speciesButton.FontSize = speciesButton.Diameter / 3 + 0.1;
             speciesButton.Text = speciesTimestamp.Species.Id;
             Grid.SetRow(speciesButton, rowIndex);
