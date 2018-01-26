@@ -11,35 +11,38 @@ namespace Neat
     {
         public int Number { get; set; }
 
-        public List<Genome> Population
+        public List<Genome> Population { get; set; }
+        public List<SpeciesTimestamp> SpeciesTimestamps { get; set; }
+
+        public Genome FittestGenome { get; set; }
+        public double SumFitness { get; set; }
+        public double SumAdjustedFitness { get; set; }
+        public double AverageFitness
         {
             get
             {
-                List<Genome> population = new List<Genome>();
-
-                foreach (List<Genome> populationBySpecies in PopulationBySpecies.Values)
-                {
-                    population.AddRange(populationBySpecies);
-                }
-
-                return population;
+                return SumFitness / Population.Count;
             }
         }
-        public Dictionary<Species, List<Genome>> PopulationBySpecies { get; set; }
-
-        public double AverageFitness { get; set; }
-        public double BestFitness { get; set; }
-
+        public double AverageAdjustedFitness
+        {
+            get
+            {
+                return SumAdjustedFitness / Population.Count;
+            }
+        }
+        
         public Generation()
         {
-            PopulationBySpecies = new Dictionary<Species, List<Genome>>();
+            Population = new List<Genome>();
+            SpeciesTimestamps = new List<SpeciesTimestamp>();
         }
 
         public Generation(Generation generation) : this()
         {
             Number = generation.Number;
-            AverageFitness = generation.AverageFitness;
-            BestFitness = generation.BestFitness;
+            SumFitness = generation.SumFitness;
+            SumAdjustedFitness = generation.SumAdjustedFitness;
         }
 
         public Generation(int number) : this()
@@ -47,13 +50,25 @@ namespace Neat
             Number = number;
         }
 
-        public void AddGenome(Genome genome)
+        public void AddGenomeAndUpdateGeneration(Genome genome)
         {
-            if (!PopulationBySpecies.ContainsKey(genome.Species))
+            // Add to population
+            Population.Add(genome);
+
+            // Add to Timestamp
+            if (!SpeciesTimestamps.Contains(genome.SpeciesTimestamp))
             {
-                PopulationBySpecies[genome.Species] = new List<Genome>();
+                SpeciesTimestamps.Add(genome.SpeciesTimestamp);
             }
-            PopulationBySpecies[genome.Species].Add(genome);
+
+            // Update Generation
+            SumFitness += genome.Fitness;
+            SumAdjustedFitness += genome.AdjustedFitness;
+
+            if (FittestGenome == null || genome.Fitness > FittestGenome.Fitness)
+            {
+                FittestGenome = genome;
+            }
         }
 
         public static Generation FromJObject(JObject json)
@@ -71,8 +86,8 @@ namespace Neat
 
             }
 
-            generation.AverageFitness = (double)json.GetValue("AverageFitness");
-            generation.BestFitness = (double)json.GetValue("BestFitness");
+            //generation.AverageFitness = (double)json.GetValue("AverageFitness");
+            //generation.BestFitness = (double)json.GetValue("BestFitness");
 
             return generation;
         }
@@ -86,15 +101,15 @@ namespace Neat
         {
             JObject json = new JObject();
 
-            JArray jarraySpecies = new JArray();
-            foreach (Species species in PopulationBySpecies.Keys)
-            {
-                jarraySpecies.Add(species.Id);
-            }
+            //JArray jarraySpecies = new JArray();
+            //foreach (Species species in PopulationBySpecies.Keys)
+            //{
+            //    jarraySpecies.Add(species.Id);
+            //}
 
-            json.Add("Species", jarraySpecies);
-            json.Add("AverageFitness", AverageFitness);
-            json.Add("BestFitness", BestFitness);
+            //json.Add("Species", jarraySpecies);
+            //json.Add("AverageFitness", AverageFitness);
+            //json.Add("BestFitness", BestFitness);
 
             return json;
         }

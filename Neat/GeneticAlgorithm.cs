@@ -11,24 +11,18 @@ namespace Neat
     {
         public List<Genome> Epoch(List<Genome> populationOfCurrentGeneration)
         {
+            // Setup the list of Genomes which will contain the next population
             List<Genome> populationForNextGeneration = new List<Genome>();
 
-            Generation newGeneration = new Generation(History.CreateNextGeneration());
-            History.AddGeneration(newGeneration);
+            // Create a new Generation for the evaluated population
+            Generation newGeneration = History.CreateAndAddNewGeneration();
 
-            foreach (Genome genome in populationOfCurrentGeneration)
-            {
-                genome.Generation = History.CurrentGeneration;
-            }
-
+            // Speciates the evaluated population and adds them to the History
             Speciate(populationOfCurrentGeneration);
 
-            foreach (Genome genome in populationOfCurrentGeneration)
-            {
-                History.CurrentGeneration.AddGenome(genome);
-            }
-
-            AdjustFitness();
+            // Adjusts the fitness of the evaluated Genomes based on their 
+            // original fitness and the number of members in their Species
+            AdjustFitness(populationOfCurrentGeneration);
             DetermineAmountToGenerateForEachSpecies();
             
             // Add the elitists to the population for the next Generation
@@ -76,110 +70,97 @@ namespace Neat
         // History.CurrentGeneration is the Generation of the evaluated Population
         private void Speciate(List<Genome> evaluatedPopulation)
         {
+            Generation previousGeneration = History.PreviousGeneration;
+            Generation currentGeneration = History.CurrentGeneration;
             List<Species> availableSpecies;
             List<Species> availableSpeciesFromPreviousGeneration;
             List<Species> availableSpeciesFromCurrentGeneration;
-            if (History.PreviousGeneration == null)
+
+            if (History.PreviousSpeciess != null)
             {
-                availableSpeciesFromPreviousGeneration = new List<Species>();
+                availableSpeciesFromPreviousGeneration = new List<Species>(History.PreviousSpeciess);
             }
             else
             {
-                availableSpeciesFromPreviousGeneration = new List<Species>(History.Speciess[History.PreviousGeneration]);
+                availableSpeciesFromPreviousGeneration = new List<Species>();
             }
 
             foreach (Genome genome in evaluatedPopulation)
             {
-                if (History.Speciess.ContainsKey(History.CurrentGeneration))
+                // Get the availableSpeciesFromCurrentGeneration after the speciating of the individual Genomes
+                // (this can change while the genomes are being speciated because new Species could be created during this Generation)
+                availableSpeciesFromCurrentGeneration = History.CurrentSpeciess;
+                if (availableSpeciesFromCurrentGeneration == null)
                 {
-                    availableSpeciesFromCurrentGeneration = History.Speciess[History.CurrentGeneration];
-                }
-                else
-                { 
                     availableSpeciesFromCurrentGeneration = new List<Species>();
                 }
 
+                // Merge the availalbe Species from the previous and the current Generation into one single List
                 availableSpecies = new List<Species>(availableSpeciesFromPreviousGeneration);
                 availableSpecies.AddRange(availableSpeciesFromCurrentGeneration);
 
+                // Iterate through this List of available Species and 
+                // check if the Genome is compatible with it. 
+                // If not -> create a new Species
                 foreach (Species species in availableSpecies)
                 {
+                    // The compatibility will be checked against the leader of the SpeciesTimestamp
                     Genome leaderGenome;
 
-                    if (History.PreviousGeneration != null && species.SpeciesTimestamps.ContainsKey(History.PreviousGeneration))
+                    if (previousGeneration != null
+                        && History.SpeciesTimestampMap.ContainsKey(previousGeneration)
+                        && History.SpeciesTimestampMap[previousGeneration].ContainsKey(species))
                     {
                         // Take the leader of this Species from the previous Generation
-                        leaderGenome = species.SpeciesTimestamps[History.PreviousGeneration].Leader;
+                        leaderGenome = History.SpeciesTimestampMap[previousGeneration][species].Leader;
                     }
                     else
                     {
                         // If the Species was created during this Epoch there won't be a
                         // leader of this Species for the previous Generation.
                         // So take the leader of this Generation instead
-                        leaderGenome = species.SpeciesTimestamps[History.CurrentGeneration].Leader;
+                        leaderGenome = History.SpeciesTimestampMap[currentGeneration][species].Leader;
                     }
 
                     double compatibility = CalculateCompatibility(genome, leaderGenome);
 
-                    if (compatibility > Stats.highestCompatibilityValue)
-                    {
-                        Stats.highestCompatibilityValue = compatibility;
-                    }
+                    /* Update Stats */
+                    Stats.UpdateHighestCompatibilityValue(compatibility);
 
                     if (compatibility <= Config.compatibilityThreshold)
                     {
-                        genome.Species = species;
-                        species.AddGenomeAndUpdateSpecies(genome);
+                        // So add the Genome to the History with 
+                        // the current Generation and the compatible Species
+                        History.AddGenomeToHistory(genome, currentGeneration, species);
 
-                        if (!History.Speciess[History.CurrentGeneration].Contains(species))
-                        {
-                            History.Speciess[History.CurrentGeneration].Add(species);
-                        }
+                        // And stop looking for a compatible Species for this Genome
                         break;
                     }
                 }
 
+                // Check if a compatible Species has been found
                 if (genome.Species == null)
                 {
                     // Genome is not compatible with any existing species -> create a new species
-                    string speciesId;
-                    if (History.Speciess.ContainsKey(History.CurrentGeneration))
-                    {
-                        speciesId = "g" + History.CurrentGeneration.Number + "s" + (History.Speciess[History.CurrentGeneration].Count + 1);
-                    }
-                    else
-                    {
-                        speciesId = "g" + History.CurrentGeneration.Number + "s" + 1;
-                    }
+                    Species newSpecies = History.CreateAndAddNewSpecies(currentGeneration);
 
-                    Species newSpecies = new Species(speciesId);
-                    SpeciesTimestamp speciesTimestamp = new SpeciesTimestamp(newSpecies);
-                    newSpecies.SpeciesTimestamps[History.CurrentGeneration] = speciesTimestamp;
-                    speciesTimestamp.Leader = genome;
-
-                    // Adds genome to Species and SpeciesTimestamp and update BestFitness of Species
-                    newSpecies.AddGenomeAndUpdateSpecies(genome);
-                    genome.Species = newSpecies;
-                    History.Speciess[History.CurrentGeneration].Add(newSpecies);
+                    // Will add the Genome to the History and
+                    // update the Generation, Species and SpeciesTimestamp.
+                    // A new SpeciesTimestamp will be created if it doesn't exist yet
+                    // and the leader of it will be initialized with this genome.
+                    History.AddGenomeToHistory(genome, currentGeneration, newSpecies);
                 }                
-            }
-
-            // Determine leaders for the speciess in the current generation
-            foreach (Species species in History.Speciess[History.CurrentGeneration])
-            {
-                species.SpeciesTimestamps[History.CurrentGeneration].SelectLeader();
             }
         }
 
         // History.CurrentGeneration is the Generation of the evaluated Population
         public List<Genome> PerformElitism(ref List<Genome> populationForNextGeneration)
         {
+            Generation currentGeneration = History.CurrentGeneration;
             List<Genome> elitists = new List<Genome>();
 
-            foreach (Species species in History.Speciess[History.CurrentGeneration])
+            foreach (SpeciesTimestamp speciesTimestamp in currentGeneration.SpeciesTimestamps)
             {
-                SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[History.CurrentGeneration];
-
                 IEnumerable<Genome> genomesOrderedByFitness = speciesTimestamp.Members.OrderByDescending(genome => genome.Fitness);
 
                 int i = 0;
@@ -188,7 +169,7 @@ namespace Neat
                     if (i < speciesTimestamp.AmountToGenerateByElitism)
                     {
                         Genome elitistCopy = new Genome(genome);
-                        elitistCopy.Id = "g" + (History.CurrentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
+                        elitistCopy.Id = "g" + (currentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
                         elitistCopy.AdjustedFitness = 0;
                         elitistCopy.Fitness = 0;
                         elitistCopy.Generation = null;
@@ -210,17 +191,16 @@ namespace Neat
 
         public List<Genome> PerformCrossover(ref List<Genome> populationForNextGeneration)
         {
+            Generation currentGeneration = History.CurrentGeneration;
             List<Genome> offspring = new List<Genome>();
 
             // Crossover for every Species
-            foreach (Species species in History.Speciess[History.CurrentGeneration])
+            foreach (SpeciesTimestamp speciesTimestamp in currentGeneration.SpeciesTimestamps)
             {
-                SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[History.CurrentGeneration];
-
-                // Until the amount to generate by crossover is reached by that Species
+                // Until the amount to generate by crossover is reached by that SpeciesTimestamp
                 for (int i = 0; i < speciesTimestamp.AmountToGenerateByCrossover; i++) { 
 
-                    bool isInterspeciesCrossover = CheckInterspeciesCrossover() || speciesTimestamp.Members.Count < 2;
+                    bool isInterspeciesCrossover = CheckInterspeciesCrossover() || (speciesTimestamp.Members.Count < 2 && currentGeneration.SpeciesTimestamps.Count > 1);
 
                     // To allow crossover either
                     //  the Species needs at least 2 members 
@@ -237,9 +217,9 @@ namespace Neat
                         {
                             // In case of interspecies crossover the second parent will
                             // be selected from a list of all the Genomes from this Generation (no matter the Species)
-                            History.CurrentGeneration.Population.Sort((genome1, genome2) => genome1.Fitness.CompareTo(genome2.Fitness));
+                            currentGeneration.Population.Sort((genome1, genome2) => genome1.Fitness.CompareTo(genome2.Fitness));
                             // Parent1 must be excluded from the list of available Genomes (second parameter)
-                            parent2 = SelectGenomeForCrossover(History.CurrentGeneration.Population, parent1);
+                            parent2 = SelectGenomeForCrossover(currentGeneration.Population, parent1);
                         }
                         else
                         {
@@ -250,7 +230,7 @@ namespace Neat
 
                         // Actually perform the crossover and put the child 
                         // into the list of Genomes for the next Generation
-                        string idForChild = "g" + (History.CurrentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
+                        string idForChild = "g" + (currentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
                         Genome child = Crossover(parent1, parent2, idForChild);
 
                         offspring.Add(child);
@@ -270,6 +250,7 @@ namespace Neat
                 
         public List<Genome> PerformMutation(ref List<Genome> populationForNextGeneration, List<Genome> offspring)
         {
+            Generation currentGeneration = History.CurrentGeneration;
             List<Genome> mutants = new List<Genome>();
 
             // Mutate the children which resulted from crossover
@@ -279,15 +260,13 @@ namespace Neat
             }
 
             // Create mutants for each Species until their AmountToGenerateByMutation is hit
-            foreach (Species species in History.Speciess[History.CurrentGeneration])
+            foreach (SpeciesTimestamp speciesTimestamp in currentGeneration.SpeciesTimestamps)
             {
-                SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[History.CurrentGeneration];
-
                 for (int i = 0; i < speciesTimestamp.AmountToGenerateByMutation; i++)
                 {
                     Genome selectedGenome = SelectGenomeForMutation(speciesTimestamp.Members);
                     Genome mutant = new Genome(selectedGenome);
-                    mutant.Id = "g" + (History.CurrentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
+                    mutant.Id = "g" + (currentGeneration.Number + 1) + ": " + (populationForNextGeneration.Count + 1);
                     mutant.AdjustedFitness = 0;
                     mutant.Fitness = 0;
                     mutant.Generation = null;
@@ -305,6 +284,21 @@ namespace Neat
             return mutants;
         }
 
+        private void AdjustFitness(List<Genome> evaluatedAndSpeciatedPopulation)
+        {
+            foreach (Genome genome in evaluatedAndSpeciatedPopulation)
+            {
+                double adjustedFitness = genome.Fitness / genome.SpeciesTimestamp.Members.Count;
+                genome.AdjustedFitness = adjustedFitness;
+                    
+                // Update the sum of adjusted Fitness in Generation, Species and SpeciesTimestamp
+                // (and with it the average of adjusted Fitness)
+                genome.Species.SumAdjustedFitness += adjustedFitness;
+                genome.Generation.SumAdjustedFitness += adjustedFitness;
+                genome.SpeciesTimestamp.SumAdjustedFitness += adjustedFitness;
+            }
+        }
+
         /**
          * Determines how many genomes are generated by:
          *  - elitism
@@ -313,54 +307,51 @@ namespace Neat
         private void DetermineAmountToGenerateForEachSpecies()
         {
             Generation currentGeneration = History.CurrentGeneration;
-            List<Species> speciesOfThisGeneration = History.Speciess[currentGeneration];
+            List<SpeciesTimestamp> currentSpeciesTimestamps = currentGeneration.SpeciesTimestamps;
 
-            double amountToBreed;
+            double amountToGenerate;
             double totalAverageAdjustedFitness = 0.0;
 
             // Calculate average adjusted fitness and total adjusted fitness for species in this generation
-            foreach (Species species in speciesOfThisGeneration)
+            foreach (SpeciesTimestamp speciesTimestamp in currentSpeciesTimestamps)
             {
-                double averageAdjustedFitness = species.SpeciesTimestamps[currentGeneration].CalculateAverageAdjustedFitness();
-                totalAverageAdjustedFitness += averageAdjustedFitness;
+                totalAverageAdjustedFitness += speciesTimestamp.AverageAdjustedFitness;
             }
 
             // Needed for rounding
             double limitForRoundingUp = 1.0 / Config.populationSize;
             double modifierForCorrectRounding = (0.5 - limitForRoundingUp);
 
-            int totalAmountToSustain = 0;
+            int totalAmountToGenerate = 0;
 
-            // Using the calculated averages we can calculate the amount of genomes a species should breed
-            foreach (Species species in speciesOfThisGeneration)
+            // Using the calculated averages we can calculate the amount of genomes a species should generate
+            foreach (SpeciesTimestamp speciesTimestamp in currentSpeciesTimestamps)
             {
-                SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[currentGeneration];
-                double averageAdjustedFitness = species.SpeciesTimestamps[currentGeneration].CalculateAverageAdjustedFitness();
-                amountToBreed = (averageAdjustedFitness / totalAverageAdjustedFitness) * Config.populationSize;
+                amountToGenerate = (speciesTimestamp.AverageAdjustedFitness / totalAverageAdjustedFitness) * Config.populationSize;
 
                 // Round to int
-                speciesTimestamp.AmountToGenerateForNextGeneration = (int)Math.Round(amountToBreed + modifierForCorrectRounding, MidpointRounding.AwayFromZero);
+                speciesTimestamp.AmountToGenerateForNextGeneration = (int)Math.Round(amountToGenerate + modifierForCorrectRounding, MidpointRounding.AwayFromZero);
 
                 // Total up the amounts to check if it matches the populationSize
-                totalAmountToSustain += speciesTimestamp.AmountToGenerateForNextGeneration;
+                totalAmountToGenerate += speciesTimestamp.AmountToGenerateForNextGeneration;
             }
 
-            // The totalAmountToSustain might be to high/low because of rounding errors
-            int targetAmountDifference = Config.populationSize - totalAmountToSustain;
+            // The totalAmountToGenerate might be to high/low because of rounding errors
+            int targetAmountDifference = Config.populationSize - totalAmountToGenerate;
             int signTargetAmountDifference = Math.Sign(targetAmountDifference);
 
-            // Increment or decrement amountToBreed of this generations speciess sequentially
+            // Increment or decrement amountToGenerate of this generations speciess sequentially
             // until the totalAmountToSustain equals the configured PopulationSize
-            while (totalAmountToSustain != Config.populationSize)
+            while (totalAmountToGenerate != Config.populationSize)
             {
-                foreach (Species species in speciesOfThisGeneration)
+                foreach (SpeciesTimestamp speciesTimestamp in currentSpeciesTimestamps)
                 {
-                    if (totalAmountToSustain == Config.populationSize)
+                    if (totalAmountToGenerate == Config.populationSize)
                     {
                         break;
                     }
-                    species.SpeciesTimestamps[currentGeneration].AmountToGenerateForNextGeneration += signTargetAmountDifference;
-                    totalAmountToSustain += signTargetAmountDifference;
+                    speciesTimestamp.AmountToGenerateForNextGeneration += signTargetAmountDifference;
+                    totalAmountToGenerate += signTargetAmountDifference;
                 }
             }
 
@@ -368,10 +359,8 @@ namespace Neat
             // should come from elitism and how many from breeding
             int numGenomesFromElitism, numGenomesFromCrossover, numGenomesFromMutation;
 
-            foreach (Species species in speciesOfThisGeneration)
+            foreach (SpeciesTimestamp speciesTimestamp in currentSpeciesTimestamps)
             {
-                SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[currentGeneration];
-
                 numGenomesFromElitism = (int)(speciesTimestamp.Members.Count * Config.genomesFromElitismRatio);
                 numGenomesFromElitism = Math.Min(numGenomesFromElitism, speciesTimestamp.AmountToGenerateForNextGeneration);
 
@@ -381,26 +370,6 @@ namespace Neat
                 speciesTimestamp.AmountToGenerateByElitism = numGenomesFromElitism;
                 speciesTimestamp.AmountToGenerateByCrossover = numGenomesFromCrossover;
                 speciesTimestamp.AmountToGenerateByMutation = numGenomesFromMutation;
-            }
-
-            foreach (Species species in speciesOfThisGeneration)
-            {
-                SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[currentGeneration];
-                int num = speciesTimestamp.AmountToGenerateByCrossover + speciesTimestamp.AmountToGenerateByElitism + speciesTimestamp.AmountToGenerateByMutation;
-                Console.WriteLine(" {0} generates {1}/{2} genomes.", speciesTimestamp.Species.Id, num, speciesTimestamp.AmountToGenerateForNextGeneration);
-            }
-        }
-
-        private void AdjustFitness()
-        {
-            foreach (Species species in History.Speciess[History.CurrentGeneration])
-            {
-                int numberOfMembers = species.SpeciesTimestamps[History.CurrentGeneration].Members.Count;
-                foreach (Genome genome in species.SpeciesTimestamps[History.CurrentGeneration].Members)
-                {
-                    double adjustedFitness = genome.Fitness / numberOfMembers;
-                    genome.AdjustedFitness = adjustedFitness;
-                }
             }
         }
 
@@ -424,13 +393,13 @@ namespace Neat
             List<Genome> actuallyAvailableGenomes = new List<Genome>(availableGenomes);
             if (excludedFromAvailableGenomes != null)
             {
-                actuallyAvailableGenomes.Remove(excludedFromAvailableGenomes);
+                availableGenomes.Remove(excludedFromAvailableGenomes);
             }
 
             int highestIndex = actuallyAvailableGenomes.Count - 1;
             if (highestIndex == 0)
             {
-                return actuallyAvailableGenomes[0];
+                return availableGenomes[0];
             }
             double gradientOfChanceForSelection = (Config.maxChanceForSelectionToCrossover - Config.minChanceForSelectionToCrossover) / highestIndex;
             double rand = Utils.RandDouble(Config.minChanceForSelectionToCrossover, Config.maxChanceForSelectionToCrossover);
@@ -737,7 +706,7 @@ namespace Neat
 
         private bool CheckInterspeciesCrossover()
         {
-            return (History.Speciess[History.CurrentGeneration].Count >= 2
+            return (History.CurrentSpeciess.Count >= 2
                     && Utils.random.NextDouble() <= Config.chanceForInterspeciesCrossover);
         }
 

@@ -8,16 +8,37 @@ namespace Neat
 {
     public class SpeciesTimestamp
     {
+        public Generation Generation { get; set; }
         public Species Species { get; set; }
         public Genome Leader { get; set; }
         public List<Genome> Members { get; set; }
+
         public int AmountToGenerateForNextGeneration { get; set; }
         public int AmountToGenerateByElitism { get; set; }
         public int AmountToGenerateByCrossover { get; set; }
         public int AmountToGenerateByMutation { get; set; }
 
-        public SpeciesTimestamp(Species species)
+        public Genome FittestGenome { get; set; }
+        public double SumFitness { get; set; }
+        public double SumAdjustedFitness { get; set; }
+        public double AverageFitness
         {
+            get
+            {
+                return SumFitness / Members.Count;
+            }
+        }
+        public double AverageAdjustedFitness
+        {
+            get
+            {
+                return SumAdjustedFitness / Members.Count;
+            }
+        }
+
+        public SpeciesTimestamp(Generation generation, Species species)
+        {
+            Generation = generation;
             Species = species;
             Members = new List<Genome>();
         }
@@ -29,28 +50,23 @@ namespace Neat
             Leader = Members[randomIndex];
         }
 
-        public double CalculateAverageFitness()
+        public void AddGenomeAndUpdateSpeciesTimestamp(Genome genome)
         {
-            double sumFitness = 0.0;
+            // Add to Timestamp
+            Members.Add(genome);
 
-            foreach (Genome genome in Members)
+            if (Members.Count == 1)
             {
-                sumFitness += genome.Fitness;
+                Leader = genome;
             }
 
-            return sumFitness / Members.Count;
-        }
-
-        public double CalculateAverageAdjustedFitness()
-        {
-            double sumAdjustedFitness = 0.0;
-
-            foreach (Genome genome in Members)
+            // Update Timestamp
+            SumFitness += genome.Fitness;
+            SumAdjustedFitness += genome.AdjustedFitness;
+            if (FittestGenome == null || genome.Fitness > FittestGenome.Fitness)
             {
-                sumAdjustedFitness += genome.AdjustedFitness;
+                FittestGenome = genome;
             }
-
-            return sumAdjustedFitness / Members.Count;
         }
     }
 }

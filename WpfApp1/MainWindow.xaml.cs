@@ -119,10 +119,9 @@ namespace WpfApp1
 
                 AddGenerationButton(generation, numberOfGenerationRows + 1);
 
-                for (int col = 0; col < History.Speciess[generation].Count; col++)
+                for (int col = 0; col < generation.SpeciesTimestamps.Count; col++)
                 {
-                    Species species = History.Speciess[generation][col];
-                    SpeciesTimestamp speciesTimestamp = species.SpeciesTimestamps[generation];
+                    SpeciesTimestamp speciesTimestamp = generation.SpeciesTimestamps[col];
 
                     AddSpeciesButton(speciesTimestamp, numberOfGenerationRows + 1, col + 2);
                 }
@@ -162,7 +161,7 @@ namespace WpfApp1
             double diameter = Math.Sqrt(adjustedArea / Math.PI) * 2;
 
             RoundButton speciesButton = new RoundButton();
-            double hue = Utils.Map(speciesTimestamp.CalculateAverageFitness(), 0.0, (double)16.0, 0.0, 110.0);
+            double hue = Utils.Map(speciesTimestamp.AverageFitness, 0.0, (double)16.0, 0.0, 110.0);
             Brush brush = new SolidColorBrush(Utils.HSBtoRGB(hue, 255.0, 255.0, 255.0));
             speciesButton.Color = brush;
             speciesButton.Diameter = diameter;
@@ -180,24 +179,27 @@ namespace WpfApp1
 
             // Initialize NeatController
             NeatController neatController = new NeatController();
+            Generation currentGeneration = History.CurrentGeneration;
             bool nextGeneration = true;
-            while (History.CurrentGeneration == null || History.CurrentGeneration.Number < 100)
+            while (currentGeneration == null || currentGeneration.Number < 100)
             {
+                currentGeneration = History.CurrentGeneration;
+
                 if (nextGeneration)
                 {
-                    if (History.CurrentGeneration != null) {
-                        foreach (Species species in History.Speciess[History.CurrentGeneration])
+                    if (currentGeneration != null) {
+                        foreach (SpeciesTimestamp speciesTimestamp in currentGeneration.SpeciesTimestamps)
                         {
-                            Console.WriteLine(" {0}: {1}", species.Id, species.SpeciesTimestamps[History.CurrentGeneration].CalculateAverageFitness());
+                            Console.WriteLine(" {0}: {1}", speciesTimestamp.Species.Id, speciesTimestamp.AverageFitness);
                         }
                     }
-                    if (History.CurrentGeneration == null)
+                    if (currentGeneration == null)
                     {
                         Console.WriteLine("-- Start Generation {0} --", 1);
                     }
                     else
                     {
-                        Console.WriteLine("-- Start Generation {0} --", History.CurrentGeneration.Number + 1);
+                        Console.WriteLine("-- Start Generation {0} --", currentGeneration.Number + 1);
                     }
 
                     Dispatcher.Invoke(() =>

@@ -11,17 +11,33 @@ namespace Neat
     {
         public string Id { get; set; }
 
-        public List<Genome> Population { get; set; }
-        public Dictionary<Generation, SpeciesTimestamp> SpeciesTimestamps { get; set; }
+        public List<Genome> Members { get; set; }
+        public List<SpeciesTimestamp> SpeciesTimestamps { get; set; }
 
         public int GenerationsNoImprovement { get; set; }
 
-        public double BestFitness { get; set; }
+        public Genome FittestGenome { get; set; }
+        public double SumFitness { get; set; }
+        public double SumAdjustedFitness { get; set; }
+        public double AverageFitness
+        {
+            get
+            {
+                return SumFitness / Members.Count;
+            }
+        }
+        public double AverageAdjustedFitness
+        {
+            get
+            {
+                return SumAdjustedFitness / Members.Count;
+            }
+        }
 
         private Species()
         {
-            Population = new List<Genome>();
-            SpeciesTimestamps = new Dictionary<Generation, SpeciesTimestamp>();
+            Members = new List<Genome>();
+            SpeciesTimestamps = new List<SpeciesTimestamp>();
             Id = "undefined";
             GenerationsNoImprovement = 0;
         }
@@ -40,24 +56,22 @@ namespace Neat
          */
         public void AddGenomeAndUpdateSpecies(Genome genome)
         {
-            SpeciesTimestamp speciesTimestamp;
-            if (!SpeciesTimestamps.ContainsKey(genome.Generation))
+            // Add to Timestamp
+            if (!SpeciesTimestamps.Contains(genome.SpeciesTimestamp))
             {
-                speciesTimestamp = new SpeciesTimestamp(this);
-                SpeciesTimestamps[genome.Generation] = speciesTimestamp;
-                speciesTimestamp.Leader = genome;
+                SpeciesTimestamps.Add(genome.SpeciesTimestamp);
             }
-            else
-            {
-                speciesTimestamp = SpeciesTimestamps[genome.Generation];
-            }
+            
+            // Add to Species
+            Members.Add(genome);
 
-            speciesTimestamp.Members.Add(genome);
-            Population.Add(genome);
+            // Update Species
+            SumFitness += genome.Fitness;
+            SumAdjustedFitness += genome.AdjustedFitness;
 
-            if (genome.Fitness > BestFitness)
+            if (FittestGenome == null || genome.Fitness > FittestGenome.Fitness)
             {
-                BestFitness = genome.Fitness;
+                FittestGenome = genome;
             }
         }
 
@@ -98,7 +112,7 @@ namespace Neat
 
             json.Add("Id", Id);
             json.Add("GenerationsNoImprovement", GenerationsNoImprovement);
-            json.Add("BestFitness", BestFitness);
+            //json.Add("BestFitness", BestFitness);
             
             return json;
         }

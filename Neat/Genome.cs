@@ -14,6 +14,7 @@ namespace Neat
         public string Id { get; set; }
 
         public Generation Generation { get; set; }
+        public SpeciesTimestamp SpeciesTimestamp { get; set; }
         public Species Species { get; set; }
 
         public List<NeuronGene> NeuronGenes { get; set; }
@@ -282,7 +283,7 @@ namespace Neat
 
             json.Add("Id", Id);
             json.Add("Generation", Generation.Number);
-            json.Add("Species", Species.Id);
+            json.Add("Species", SpeciesTimestamp.Species.Id);
             json.Add("NeuronGenes", neuronGenes);
             json.Add("ConnectionGenes", connectionGenes);
             json.Add("NumberOfInputs", NumberOfInputs);
