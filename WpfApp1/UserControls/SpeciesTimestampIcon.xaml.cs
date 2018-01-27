@@ -16,13 +16,12 @@ using System.Windows.Shapes;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaktionslogik für RoundButton.xaml
+    /// Interaktionslogik für SpeciesTimestampIcon.xaml
     /// </summary>
-    public partial class RoundButton : UserControl
+    public partial class SpeciesTimestampIcon : UserControl
     {
-        public RoundButton()
+        public SpeciesTimestampIcon()
         {
-            FontSize = 0.1;
             InitializeComponent();
         }
 
@@ -32,7 +31,7 @@ namespace WpfApp1
             set { SetValue(ColorProperty, value); }
         }
         public static readonly DependencyProperty ColorProperty =
-            DependencyProperty.Register("Color", typeof(Brush), typeof(RoundButton), new PropertyMetadata(Brushes.Transparent));
+            DependencyProperty.Register("Color", typeof(Brush), typeof(SpeciesTimestampIcon), new PropertyMetadata(Brushes.Transparent));
 
         public String Text
         {
@@ -40,7 +39,7 @@ namespace WpfApp1
             set { SetValue(TextProperty, value); }
         }
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(String), typeof(RoundButton), new PropertyMetadata());
+            DependencyProperty.Register("Text", typeof(String), typeof(SpeciesTimestampIcon), new PropertyMetadata());
 
         public double Diameter
         {
@@ -48,21 +47,21 @@ namespace WpfApp1
             set { SetValue(DiameterProperty, value); }
         }
         public static readonly DependencyProperty DiameterProperty =
-            DependencyProperty.Register("Diameter", typeof(double), typeof(RoundButton), new PropertyMetadata());
+            DependencyProperty.Register("Diameter", typeof(double), typeof(SpeciesTimestampIcon), new PropertyMetadata());
 
-        public double FontSize
+        public double TextSize
         {
             get { return (double)GetValue(FontSizeProperty); }
             set { SetValue(FontSizeProperty, value); }
         }
         public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register("FontSize", typeof(double), typeof(RoundButton), new PropertyMetadata());
+            DependencyProperty.Register("FontSize", typeof(double), typeof(SpeciesTimestampIcon), new PropertyMetadata());
 
 
-        public event MouseButtonEventHandler RoundButtonMouseDown;
-        private void RoundButton_MouseDown(object sender, MouseButtonEventArgs e)
+        public event MouseButtonEventHandler SpeciesTimestampIconMouseDown;
+        private void SpeciesTimestampIcon_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (RoundButtonMouseDown != null) RoundButtonMouseDown(this, e);
+            if (SpeciesTimestampIconMouseDown != null) SpeciesTimestampIconMouseDown(this, e);
             e.Handled = true;
         }
     }

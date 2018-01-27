@@ -59,8 +59,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="GenerationButton.xaml.cs">
-      <DependentUpon>GenerationButton.xaml</DependentUpon>
+    <Compile Include="Converters\BaseConverter.cs" />
+    <Compile Include="Converters\FitnessToColorConverter.cs" />
+    <Compile Include="UserControls\SpeciesTimestampsOfGeneration.xaml.cs">
+      <DependentUpon>SpeciesTimestampsOfGeneration.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\SpeciesTimestampIcon.xaml.cs">
+      <DependentUpon>SpeciesTimestampIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\GenerationIcon.xaml.cs">
+      <DependentUpon>GenerationIcon.xaml</DependentUpon>
     </Compile>
     <Compile Include="GenerationSpeciesHistory.xaml.cs">
       <DependentUpon>GenerationSpeciesHistory.xaml</DependentUpon>
@@ -84,7 +92,15 @@
     <Compile Include="Utils.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="World.cs" />
-    <Page Include="GenerationButton.xaml">
+    <Page Include="UserControls\SpeciesTimestampsOfGeneration.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\SpeciesTimestampIcon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\GenerationIcon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

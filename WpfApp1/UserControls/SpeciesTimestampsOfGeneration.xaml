@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="WpfApp1.SpeciesTimestampsOfGeneration"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             x:Name="selfSpeciesTimestampOfGeneration">
+
+    <!-- SpeciesTimestamp Icons -->
+    <ItemsControl ItemsSource="{Binding SpeciesTimestamps}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <local:SpeciesTimestampIcon Diameter="{Binding ElementName=selfSpeciesTimestampOfGeneration, Path=Diameter}" Foreground="Black"/>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

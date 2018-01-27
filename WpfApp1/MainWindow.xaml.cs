@@ -97,45 +97,44 @@ namespace WpfApp1
             int numberOfGenerationRows = grid.RowDefinitions.Count - 1;
 
             // Grid is updated when a new Generation was created
-            AddBoundGenerationButton(History.CurrentGeneration);
 
-            //int maxNumberOfSpeciesPerGeneration = 0;
-            //foreach (List<Species> speciess in History.Speciess.Values)
-            //{
-            //    if (speciess.Count > maxNumberOfSpeciesPerGeneration)
-            //    {
-            //        maxNumberOfSpeciesPerGeneration = speciess.Count;
-            //    }
-            //}
+            int maxNumberOfSpeciesPerGeneration = 0;
+            foreach (List<Species> speciess in History.Speciess.Values)
+            {
+                if (speciess.Count > maxNumberOfSpeciesPerGeneration)
+                {
+                    maxNumberOfSpeciesPerGeneration = speciess.Count;
+                }
+            }
 
-            //for (; numberOfSpeciesColumns < maxNumberOfSpeciesPerGeneration; numberOfSpeciesColumns++)
-            //{
-            //    ColumnDefinition column = new ColumnDefinition();
-            //    column.Width = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
+            for (; numberOfSpeciesColumns < maxNumberOfSpeciesPerGeneration; numberOfSpeciesColumns++)
+            {
+                ColumnDefinition column = new ColumnDefinition();
+                column.Width = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
 
-            //    grid.ColumnDefinitions.Add(column);
+                grid.ColumnDefinitions.Add(column);
 
-            //    Grid.SetColumnSpan(headerSpecies, numberOfSpeciesColumns + 1);
-            //    headerSpecies.Width = numberOfSpeciesColumns * Math.Max(generationDiameter, maxSpeciesDiameter);
-            //}
+                Grid.SetColumnSpan(headerSpecies, numberOfSpeciesColumns + 1);
+                headerSpecies.Width = numberOfSpeciesColumns * Math.Max(generationDiameter, maxSpeciesDiameter);
+            }
 
-            //for (; numberOfGenerationRows < History.Generations.Count; numberOfGenerationRows++)
-            //{
-            //    Generation generation = History.Generations[numberOfGenerationRows];
+            for (; numberOfGenerationRows < History.Generations.Count; numberOfGenerationRows++)
+            {
+                Generation generation = History.Generations[numberOfGenerationRows];
 
-            //    RowDefinition row = new RowDefinition();
-            //    row.Height = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
-            //    grid.RowDefinitions.Add(row);
+                RowDefinition row = new RowDefinition();
+                row.Height = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
+                grid.RowDefinitions.Add(row);
 
-            //    AddGenerationButton(generation, numberOfGenerationRows + 1);
+                AddGenerationButton(generation, numberOfGenerationRows + 1);
 
-            //    for (int col = 0; col < generation.SpeciesTimestamps.Count; col++)
-            //    {
-            //        SpeciesTimestamp speciesTimestamp = generation.SpeciesTimestamps[col];
+                for (int col = 0; col < generation.SpeciesTimestamps.Count; col++)
+                {
+                    SpeciesTimestamp speciesTimestamp = generation.SpeciesTimestamps[col];
 
-            //        AddSpeciesButton(speciesTimestamp, numberOfGenerationRows + 1, col + 2);
-            //    }
-            //}
+                    AddSpeciesButton(speciesTimestamp, numberOfGenerationRows + 1, col + 2);
+                }
+            }
         }
 
         private void Initialize()
@@ -161,15 +160,6 @@ namespace WpfApp1
             Grid.SetRow(generationButton, rowIndex);
             Grid.SetColumn(generationButton, 0);
             grid.Children.Add(generationButton);
-        }
-
-        private void AddBoundGenerationButton(Generation generation)
-        {
-            GenerationButton generationButton = new GenerationButton();
-            generationButton.DataContext = generation;
-            generationButton.Diameter = generationDiameter;
-            generationButton.FontSize = generationButton.Diameter / 3;
-            //grid.Children.Add(generationButton);
         }
 
         private void AddSpeciesButton(SpeciesTimestamp speciesTimestamp, int rowIndex, int colIndex)

@@ -7,23 +7,32 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
-    <ItemsControl Name="itemsControl" ItemsSource="{Binding History.Generations}">
-        <!-- ItemsPanelItem -->
-        <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-                <StackPanel Orientation="Vertical"/>
-            </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        
-        <!-- ItemTemplate -->
-        <ItemsControl.ItemTemplate>
-            <DataTemplate>
-                <StackPanel Name="generationRow" Orientation="Horizontal">
-                    <local:GenerationButton Diameter="60" FontSize="40" Foreground="Black"/>
-                    <StackPanel Width="20"/>
-                    <local:GenerationButton Diameter="60" FontSize="28" Foreground="Black"/>
-                </StackPanel>
-            </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <ScrollViewer>
+        <ItemsControl Name="itemsControl" ItemsSource="{Binding History.Generations}">
+            <!-- ItemsPanelItem -->
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <!-- ItemTemplate -->
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+
+                    <!-- Row for the Generation -->
+                    <StackPanel Name="generationRow" Orientation="Horizontal">
+                        <!-- Generation Icon -->
+                        <local:GenerationIcon Diameter="60" Foreground="Black"/>
+
+                        <!-- Separator -->
+                        <StackPanel Width="20"/>
+
+                        <local:SpeciesTimestampsOfGeneration Diameter="60"/>
+
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
 </UserControl>

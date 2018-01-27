@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaktionslogik für GenerationButton.xaml
+    /// Interaktionslogik für GenerationIcon.xaml
     /// </summary>
-    public partial class GenerationButton : UserControl
+    public partial class GenerationIcon : UserControl
     {
-        public GenerationButton()
+        public GenerationIcon()
         {
             InitializeComponent();
         }
@@ -31,7 +31,7 @@ namespace WpfApp1
             set { SetValue(ColorProperty, value); }
         }
         public static readonly DependencyProperty ColorProperty =
-            DependencyProperty.Register("Color", typeof(Brush), typeof(GenerationButton), new PropertyMetadata(Brushes.Transparent));
+            DependencyProperty.Register("Color", typeof(Brush), typeof(GenerationIcon), new PropertyMetadata(Brushes.Transparent));
 
         public String Text
         {
@@ -39,7 +39,7 @@ namespace WpfApp1
             set { SetValue(TextProperty, value); }
         }
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register("Text", typeof(String), typeof(GenerationButton), new PropertyMetadata());
+            DependencyProperty.Register("Text", typeof(String), typeof(GenerationIcon), new PropertyMetadata());
 
         public double Diameter
         {
@@ -47,7 +47,7 @@ namespace WpfApp1
             set { SetValue(DiameterProperty, value); }
         }
         public static readonly DependencyProperty DiameterProperty =
-            DependencyProperty.Register("Diameter", typeof(double), typeof(GenerationButton), new PropertyMetadata());
+            DependencyProperty.Register("Diameter", typeof(double), typeof(GenerationIcon), new PropertyMetadata());
 
         public double TextSize
         {
@@ -55,13 +55,13 @@ namespace WpfApp1
             set { SetValue(FontSizeProperty, value); }
         }
         public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register("FontSize", typeof(double), typeof(GenerationButton), new PropertyMetadata());
+            DependencyProperty.Register("FontSize", typeof(double), typeof(GenerationIcon), new PropertyMetadata());
 
 
-        public event MouseButtonEventHandler GenerationButtonMouseDown;
-        private void GenerationButton_MouseDown(object sender, MouseButtonEventArgs e)
+        public event MouseButtonEventHandler GenerationIconMouseDown;
+        private void GenerationIcon_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (GenerationButtonMouseDown != null) GenerationButtonMouseDown(this, e);
+            if (GenerationIconMouseDown != null) GenerationIconMouseDown(this, e);
             e.Handled = true;
         }
     }

@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="WpfApp1.SpeciesTimestampIcon"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             x:Name="selfSpeciesTimestampIcon">
+    
+    <Grid>
+        <Grid.ToolTip>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Best Fitness:"/>
+                    <Label Content="{Binding FittestGenome.Fitness}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Average Fitness:"/>
+                    <Label Content="{Binding AverageFitness}"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid.ToolTip>
+        <Viewbox Margin="2">
+            <Grid>
+                <Ellipse Fill="{Binding AverageFitness, Mode=OneWay, Converter={local:FitnessToColorConverter}, ConverterParameter='0,0;16,0'}" 
+                         Width="{Binding ElementName=selfSpeciesTimestampIcon, Path=Diameter}" 
+                         Height="{Binding ElementName=selfSpeciesTimestampIcon, Path=Diameter}"/>
+                <Viewbox Margin="10">
+                    <TextBlock VerticalAlignment="Center" Text="{Binding Species.Id}" Foreground="{Binding ElementName=selfSpeciesTimestampIcon, Path=Foreground}" FontSize="{Binding ElementName=selfSpeciesTimestampIcon, Path=FontSize}" TextAlignment="Center"/>
+                </Viewbox>
+            </Grid>
+        </Viewbox>
+    </Grid>
+</UserControl>

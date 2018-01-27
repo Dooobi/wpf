@@ -16,18 +16,21 @@ using System.Windows.Shapes;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaktionslogik für Graph.xaml
+    /// Interaktionslogik für SpeciesTimestampsOfGeneration.xaml
     /// </summary>
-    public partial class Graph : UserControl
+    public partial class SpeciesTimestampsOfGeneration : UserControl
     {
-        public Graph()
+        public SpeciesTimestampsOfGeneration()
         {
             InitializeComponent();
         }
 
-        public Graph(DrawingImage drawingImage) : this()
+        public double Diameter
         {
-            myImage.Source = drawingImage;
+            get { return (double)GetValue(DiameterProperty); }
+            set { SetValue(DiameterProperty, value); }
         }
+        public static readonly DependencyProperty DiameterProperty =
+            DependencyProperty.Register("Diameter", typeof(double), typeof(SpeciesTimestampsOfGeneration), new PropertyMetadata());
     }
 }
