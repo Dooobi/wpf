@@ -19,6 +19,10 @@
                     <Label Content="Average Fitness:"/>
                     <Label Content="{Binding AverageFitness}"/>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Number of Members:"/>
+                    <Label Content="{Binding Members.Count}"/>
+                </StackPanel>
             </StackPanel>
         </Grid.ToolTip>
         <Viewbox Margin="2">

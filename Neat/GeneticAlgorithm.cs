@@ -400,7 +400,7 @@ namespace Neat
             List<Genome> actuallyAvailableGenomes = new List<Genome>(availableGenomes);
             if (excludedFromAvailableGenomes != null)
             {
-                availableGenomes.Remove(excludedFromAvailableGenomes);
+                actuallyAvailableGenomes.Remove(excludedFromAvailableGenomes);
             }
 
             int highestIndex = actuallyAvailableGenomes.Count - 1;
