@@ -15,30 +15,4 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <StackPanel Orientation="Vertical">
-        <StackPanel Orientation="Horizontal" Height="40px">
-            <Border Width="40px" Height="40px">
-                <Button Content="1" Template = "{StaticResource ButtonTemplate}" FontSize="24" FontWeight="Bold" />
-            </Border>
-            <Rectangle Width="30px"/>
-            <Button Content="1" Template = "{StaticResource ButtonTemplate}" Width="40px" FontSize="24" FontWeight="Bold" />
-            <Button Content="1" Template = "{StaticResource ButtonTemplate}" Width="40px" FontSize="24" FontWeight="Bold" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Height="40px">
-            <Border Width="40px" Height="40px">
-                <Button Content="1" Template = "{StaticResource ButtonTemplate}" FontSize="24" FontWeight="Bold" />
-            </Border>
-            <Rectangle Width="30px"/>
-            <Button Content="1" Template = "{StaticResource ButtonTemplate}" Width="40px" FontSize="24" FontWeight="Bold" />
-            <Button Content="1" Template = "{StaticResource ButtonTemplate}" Width="40px" FontSize="24" FontWeight="Bold" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Height="40px">
-            <Border Width="40px" Height="40px">
-                <Button Content="1" Template = "{StaticResource ButtonTemplate}" FontSize="24" FontWeight="Bold" />
-            </Border>
-            <Rectangle Width="30px"/>
-            <Button Content="1" Template = "{StaticResource ButtonTemplate}" Width="40px" FontSize="24" FontWeight="Bold" />
-            <Button Content="1" Template = "{StaticResource ButtonTemplate}" Width="40px" FontSize="24" FontWeight="Bold" />
-        </StackPanel>
-    </StackPanel>
 </UserControl>

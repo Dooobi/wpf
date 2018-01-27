@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="525" Loaded="Window_Loaded"
+        Title="MainWindow" Height="900" Width="525"
         Background="#222222">
 
     <Window.Resources>
@@ -19,13 +19,6 @@
     <!--<Window.DataContext>
         <local:ViewModel/>
     </Window.DataContext>-->
-
-    <ScrollViewer>
-        <StackPanel Orientation="Vertical">
-            <Grid x:Name="grid" local:GridHelpers.RowCount="100">
-            </Grid>
-        </StackPanel>
-    </ScrollViewer>
 
     <!--<DataGrid ItemsSource="{Binding Speciess}" FrozenColumnCount="1" AutoGenerateColumns="True" IsReadOnly="True">
         <DataGrid.Columns>

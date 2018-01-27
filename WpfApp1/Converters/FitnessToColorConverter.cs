@@ -12,8 +12,7 @@ namespace WpfApp1
     [ValueConversion(typeof(double), typeof(Brush))]
     public class FitnessToColorConverter : BaseConverter, IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter,
-                          System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             double fitness = (double)value;
             string fitnessRange = parameter as string;
@@ -26,7 +25,7 @@ namespace WpfApp1
                 
                 if (success && fitness >= minFitness && fitness <= maxFitness)
                 {
-                    double hue = Utils.Map(fitness, minFitness, maxFitness, 0.0, 110.0);
+                    double hue = Utils.Map(fitness, minFitness, maxFitness, 00.0, 70.0);
                     return new SolidColorBrush(Utils.HSBtoRGB(hue, 255.0, 255.0, 255.0));
                 }
             }
@@ -34,8 +33,7 @@ namespace WpfApp1
             return Brushes.Gray;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter,
-                            System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return null;
         }
