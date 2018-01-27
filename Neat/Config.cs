@@ -8,7 +8,7 @@ namespace Neat
 {
     public static class Config
     {
-        public static int populationSize = 100;
+        public static int populationSize = 200;
         public static int numberOfInputs = 2;
         public static int numberOfOutputs = 1;
         public static double minWeightLimit = -1.0;

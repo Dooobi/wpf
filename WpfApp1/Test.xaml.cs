@@ -34,6 +34,9 @@ namespace WpfApp1
             InitializeComponent();
             Initialize();
 
+            // Make tooltips stay forever
+            ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(Int32.MaxValue));
+
             itemsControl.DataContext = this;
 
             History = History.Singleton;

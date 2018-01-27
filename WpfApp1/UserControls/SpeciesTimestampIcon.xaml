@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              x:Name="selfSpeciesTimestampIcon">
-    
+
     <Grid>
         <Grid.ToolTip>
             <StackPanel>
@@ -22,6 +22,22 @@
                 <StackPanel Orientation="Horizontal">
                     <Label Content="Number of Members:"/>
                     <Label Content="{Binding Members.Count}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Generate for next Generation:"/>
+                    <Label Content="{Binding AmountToGenerateForNextGeneration}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Generate by elitism:"/>
+                    <Label Content="{Binding AmountToGenerateByElitism}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Generate by crossover:"/>
+                    <Label Content="{Binding AmountToGenerateByCrossover}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Generate by mutation:"/>
+                    <Label Content="{Binding AmountToGenerateByMutation}"/>
                 </StackPanel>
             </StackPanel>
         </Grid.ToolTip>

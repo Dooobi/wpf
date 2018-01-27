@@ -25,12 +25,12 @@
                     <!-- Row for the Generation -->
                     <StackPanel Name="generationRow" Orientation="Horizontal">
                         <!-- Generation Icon -->
-                        <local:GenerationIcon Diameter="60" Foreground="Black"/>
+                        <local:GenerationIcon Diameter="40" Foreground="Black"/>
 
                         <!-- Separator -->
                         <StackPanel Width="20"/>
 
-                        <local:SpeciesTimestampsOfGeneration Diameter="60"/>
+                        <local:SpeciesTimestampsOfGeneration Diameter="40"/>
 
                     </StackPanel>
                 </DataTemplate>

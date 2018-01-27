@@ -207,7 +207,7 @@ namespace Neat
                 // Until the amount to generate by crossover is reached by that SpeciesTimestamp
                 for (int i = 0; i < speciesTimestamp.AmountToGenerateByCrossover; i++) { 
 
-                    bool isInterspeciesCrossover = CheckInterspeciesCrossover() || (speciesTimestamp.Members.Count < 2 && currentGeneration.SpeciesTimestamps.Count > 1);
+                    bool isInterspeciesCrossover = CheckInterspeciesCrossover();
 
                     // To allow crossover either
                     //  the Species needs at least 2 members 
@@ -247,7 +247,9 @@ namespace Neat
                     {
                         // Crossover is not possible because the Species doesn't have at least 2 members
                         // and interspecies crossover is not active -> Mutate instead
-                        //speciesTimestamp.AmountToGenerateByMutation++;
+                        speciesTimestamp.AmountToGenerateByMutation++;
+                        speciesTimestamp.AmountToGenerateByCrossover--;
+                        i--;
                     }
                 }
             }
