@@ -10,6 +10,6 @@
 
     <Grid>
         <Ellipse Fill="{Binding ElementName=self, Path=Color}" Width="{Binding ElementName=self, Path=Diameter}" Height="{Binding ElementName=self, Path=Diameter}"/>
-        <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=self, Path=Text}" Foreground="White" FontSize="{Binding ElementName=self, Path=FontSize}" TextAlignment="Center"/>
+        <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=self, Path=Text}" Foreground="Black" FontSize="{Binding ElementName=self, Path=FontSize}" TextAlignment="Center"/>
     </Grid>
 </UserControl>

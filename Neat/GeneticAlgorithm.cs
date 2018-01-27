@@ -9,6 +9,13 @@ namespace Neat
 {
     public class GeneticAlgorithm
     {
+        public History History {
+            get
+            {
+                return History.Singleton;
+            }
+        }
+
         public List<Genome> Epoch(List<Genome> populationOfCurrentGeneration)
         {
             // Setup the list of Genomes which will contain the next population

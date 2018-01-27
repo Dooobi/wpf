@@ -9,6 +9,14 @@ namespace Neat
 {
     public class NeatController
     {
+        public History History
+        {
+            get
+            {
+                return History.Singleton;
+            }
+        }
+
         public GeneticAlgorithm GeneticAlgorithm { get; set; }
 
         public Stack<Genome> CurrentPopulationBeforeEvaluation { get; set; }
@@ -19,7 +27,6 @@ namespace Neat
             CurrentPopulationBeforeEvaluation = new Stack<Genome>();
             CurrentPopulationAfterEvaluation = new List<Genome>();
             GeneticAlgorithm = new GeneticAlgorithm();
-            History.InitHistory();
             CreateInitialPopulation();
         }
 

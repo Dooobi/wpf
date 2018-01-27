@@ -12,6 +12,14 @@ namespace WpfApp1
 {
     public class ViewModel
     {
+        public History History
+        {
+            get
+            {
+                return History.Singleton;
+            }
+        }
+
         private List<List<double>> inputPatterns;
         private List<double> answers;
         public Brush Colo { get; set; }

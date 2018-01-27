@@ -6,14 +6,32 @@ using System.Threading.Tasks;
 
 namespace Neat
 {
-    public static class History
+    public class History
     {
-        public static List<Genome> PopulationThroughoutHistory { get; set; }
-        public static List<Generation> Generations { get; set; }
-        public static Dictionary<Generation, List<Species>> Speciess { get; set; }
-        public static Dictionary<Generation, Dictionary<Species, SpeciesTimestamp>> SpeciesTimestampMap { get; set; }
+        private static History singleton;
+        public static History Singleton
+        {
+            get
+            {
+                if (singleton == null)
+                {
+                    singleton = new History();
+                }
+                return singleton;
+            }
+        }
 
-        public static void InitHistory()
+        public List<Genome> PopulationThroughoutHistory { get; set; }
+        public List<Generation> Generations { get; set; }
+        public Dictionary<Generation, List<Species>> Speciess { get; set; }
+        public Dictionary<Generation, Dictionary<Species, SpeciesTimestamp>> SpeciesTimestampMap { get; set; }
+
+        private History()
+        {
+            InitHistory();
+        }
+
+        public void InitHistory()
         {
             PopulationThroughoutHistory = new List<Genome>();
             Generations = new List<Generation>();
@@ -21,7 +39,7 @@ namespace Neat
             SpeciesTimestampMap = new Dictionary<Generation, Dictionary<Species, SpeciesTimestamp>>();
         }
 
-        public static Generation PreviousGeneration
+        public Generation PreviousGeneration
         {
             get
             {
@@ -33,7 +51,7 @@ namespace Neat
             }
         }
 
-        public static Generation CurrentGeneration
+        public Generation CurrentGeneration
         {
             get
             {
@@ -45,7 +63,7 @@ namespace Neat
             }
         }
 
-        public static List<Species> PreviousSpeciess
+        public List<Species> PreviousSpeciess
         {
             get
             {
@@ -58,7 +76,7 @@ namespace Neat
             }
         }
 
-        public static List<Species> CurrentSpeciess
+        public List<Species> CurrentSpeciess
         {
             get
             {
@@ -71,7 +89,7 @@ namespace Neat
             }
         }
 
-        public static Generation CreateAndAddNewGeneration()
+        public Generation CreateAndAddNewGeneration()
         {
             Generation generation;
             int number = 1;
@@ -86,7 +104,7 @@ namespace Neat
             return generation;
         }
 
-        public static Species CreateAndAddNewSpecies(Generation originGeneration)
+        public Species CreateAndAddNewSpecies(Generation originGeneration)
         {
             Species species;
             string speciesId;
@@ -102,7 +120,7 @@ namespace Neat
             return species;
         }
 
-        public static void AddGenomeToHistory(Genome genome, Generation generation, Species species)
+        public void AddGenomeToHistory(Genome genome, Generation generation, Species species)
         {
             if (!Generations.Contains(generation))
             {

@@ -65,6 +65,7 @@
     <Compile Include="Graph.xaml.cs">
       <DependentUpon>Graph.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GridHelpers.cs" />
     <Compile Include="NeatGraph.cs" />
     <Compile Include="RoundButton.xaml.cs">
       <DependentUpon>RoundButton.xaml</DependentUpon>

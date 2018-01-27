@@ -23,6 +23,13 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
+        public History History {
+            get
+            {
+                return History.Singleton;
+            }
+        }
+
         private double generationDiameter = 60;
         private double maxSpeciesDiameter = 60;
         private double minSpeciesDiameter = 5;
@@ -142,7 +149,7 @@ namespace WpfApp1
         private void AddGenerationButton(Generation generation, int rowIndex)
         {
             RoundButton generationButton = new RoundButton();
-
+            generationButton.DataContext = generation;
             generationButton.Color = Brushes.CornflowerBlue;
             generationButton.Diameter = generationDiameter;
             generationButton.FontSize = generationButton.Diameter / 3;
