@@ -77,18 +77,18 @@ namespace WpfApp1
             grid.ColumnDefinitions.Add(column);
 
             // Row for the headers
-            RowDefinition row = new RowDefinition();
-            row.Height = new GridLength(40);
-            grid.RowDefinitions.Add(row);
+            //RowDefinition row = new RowDefinition();
+            //row.Height = new GridLength(40);
+            //grid.RowDefinitions.Add(row);
 
-            // Add headers
-            Grid.SetRow(headerGeneration, 0);
-            Grid.SetColumn(headerGeneration, 0);
-            grid.Children.Add(headerGeneration);
+            //// Add headers
+            //Grid.SetRow(headerGeneration, 0);
+            //Grid.SetColumn(headerGeneration, 0);
+            //grid.Children.Add(headerGeneration);
 
-            Grid.SetRow(headerSpecies, 0);
-            Grid.SetColumn(headerSpecies, 2);
-            grid.Children.Add(headerSpecies);
+            //Grid.SetRow(headerSpecies, 0);
+            //Grid.SetColumn(headerSpecies, 2);
+            //grid.Children.Add(headerSpecies);
         }
 
         private void UpdateGrid()
@@ -96,43 +96,46 @@ namespace WpfApp1
             int numberOfSpeciesColumns = grid.ColumnDefinitions.Count - 2;
             int numberOfGenerationRows = grid.RowDefinitions.Count - 1;
 
-            int maxNumberOfSpeciesPerGeneration = 0;
-            foreach (List<Species> speciess in History.Speciess.Values)
-            {
-                if (speciess.Count > maxNumberOfSpeciesPerGeneration)
-                {
-                    maxNumberOfSpeciesPerGeneration = speciess.Count;
-                }
-            }
+            // Grid is updated when a new Generation was created
+            AddBoundGenerationButton(History.CurrentGeneration);
 
-            for (; numberOfSpeciesColumns < maxNumberOfSpeciesPerGeneration; numberOfSpeciesColumns++)
-            {
-                ColumnDefinition column = new ColumnDefinition();
-                column.Width = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
+            //int maxNumberOfSpeciesPerGeneration = 0;
+            //foreach (List<Species> speciess in History.Speciess.Values)
+            //{
+            //    if (speciess.Count > maxNumberOfSpeciesPerGeneration)
+            //    {
+            //        maxNumberOfSpeciesPerGeneration = speciess.Count;
+            //    }
+            //}
 
-                grid.ColumnDefinitions.Add(column);
+            //for (; numberOfSpeciesColumns < maxNumberOfSpeciesPerGeneration; numberOfSpeciesColumns++)
+            //{
+            //    ColumnDefinition column = new ColumnDefinition();
+            //    column.Width = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
 
-                Grid.SetColumnSpan(headerSpecies, numberOfSpeciesColumns + 1);
-                headerSpecies.Width = numberOfSpeciesColumns * Math.Max(generationDiameter, maxSpeciesDiameter);
-            }
+            //    grid.ColumnDefinitions.Add(column);
 
-            for (; numberOfGenerationRows < History.Generations.Count; numberOfGenerationRows++)
-            {
-                Generation generation = History.Generations[numberOfGenerationRows];
+            //    Grid.SetColumnSpan(headerSpecies, numberOfSpeciesColumns + 1);
+            //    headerSpecies.Width = numberOfSpeciesColumns * Math.Max(generationDiameter, maxSpeciesDiameter);
+            //}
 
-                RowDefinition row = new RowDefinition();
-                row.Height = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
-                grid.RowDefinitions.Add(row);
+            //for (; numberOfGenerationRows < History.Generations.Count; numberOfGenerationRows++)
+            //{
+            //    Generation generation = History.Generations[numberOfGenerationRows];
 
-                AddGenerationButton(generation, numberOfGenerationRows + 1);
+            //    RowDefinition row = new RowDefinition();
+            //    row.Height = new GridLength(Math.Max(generationDiameter, maxSpeciesDiameter));
+            //    grid.RowDefinitions.Add(row);
 
-                for (int col = 0; col < generation.SpeciesTimestamps.Count; col++)
-                {
-                    SpeciesTimestamp speciesTimestamp = generation.SpeciesTimestamps[col];
+            //    AddGenerationButton(generation, numberOfGenerationRows + 1);
 
-                    AddSpeciesButton(speciesTimestamp, numberOfGenerationRows + 1, col + 2);
-                }
-            }
+            //    for (int col = 0; col < generation.SpeciesTimestamps.Count; col++)
+            //    {
+            //        SpeciesTimestamp speciesTimestamp = generation.SpeciesTimestamps[col];
+
+            //        AddSpeciesButton(speciesTimestamp, numberOfGenerationRows + 1, col + 2);
+            //    }
+            //}
         }
 
         private void Initialize()
@@ -154,10 +157,19 @@ namespace WpfApp1
             generationButton.Diameter = generationDiameter;
             generationButton.FontSize = generationButton.Diameter / 3;
             generationButton.Text = generation.Number + "";
-            
+
             Grid.SetRow(generationButton, rowIndex);
             Grid.SetColumn(generationButton, 0);
             grid.Children.Add(generationButton);
+        }
+
+        private void AddBoundGenerationButton(Generation generation)
+        {
+            GenerationButton generationButton = new GenerationButton();
+            generationButton.DataContext = generation;
+            generationButton.Diameter = generationDiameter;
+            generationButton.FontSize = generationButton.Diameter / 3;
+            //grid.Children.Add(generationButton);
         }
 
         private void AddSpeciesButton(SpeciesTimestamp speciesTimestamp, int rowIndex, int colIndex)
@@ -199,6 +211,12 @@ namespace WpfApp1
                         {
                             Console.WriteLine(" {0}: {1}", speciesTimestamp.Species.Id, speciesTimestamp.AverageFitness);
                         }
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            //Dein Code der synchronisiert zur GUI läuft
+                            UpdateGrid();
+                        });
                     }
                     if (currentGeneration == null)
                     {
@@ -208,12 +226,6 @@ namespace WpfApp1
                     {
                         Console.WriteLine("-- Start Generation {0} --", currentGeneration.Number + 1);
                     }
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        //Dein Code der synchronisiert zur GUI läuft
-                        UpdateGrid();
-                    });
                 }
 
                 Genome genome = neatController.GetNextGenomeToEvaluate();

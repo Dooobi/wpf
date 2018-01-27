@@ -22,7 +22,7 @@
 
     <ScrollViewer>
         <StackPanel Orientation="Vertical">
-            <Grid x:Name="grid" local:GridHelpers.RowCount="{Binding History.Generations.Count}">
+            <Grid x:Name="grid" local:GridHelpers.RowCount="100">
             </Grid>
         </StackPanel>
     </ScrollViewer>

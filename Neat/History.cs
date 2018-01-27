@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Neat
         }
 
         public List<Genome> PopulationThroughoutHistory { get; set; }
-        public List<Generation> Generations { get; set; }
+        public ObservableCollection<Generation> Generations { get; set; }
         public Dictionary<Generation, List<Species>> Speciess { get; set; }
         public Dictionary<Generation, Dictionary<Species, SpeciesTimestamp>> SpeciesTimestampMap { get; set; }
 
@@ -34,7 +35,7 @@ namespace Neat
         public void InitHistory()
         {
             PopulationThroughoutHistory = new List<Genome>();
-            Generations = new List<Generation>();
+            Generations = new ObservableCollection<Generation>();
             Speciess = new Dictionary<Generation, List<Species>>();
             SpeciesTimestampMap = new Dictionary<Generation, Dictionary<Species, SpeciesTimestamp>>();
         }

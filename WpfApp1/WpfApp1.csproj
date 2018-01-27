@@ -59,6 +59,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GenerationButton.xaml.cs">
+      <DependentUpon>GenerationButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GenerationSpeciesHistory.xaml.cs">
       <DependentUpon>GenerationSpeciesHistory.xaml</DependentUpon>
     </Compile>
@@ -67,8 +70,12 @@
     </Compile>
     <Compile Include="GridHelpers.cs" />
     <Compile Include="NeatGraph.cs" />
+    <Compile Include="PhantomPanel.cs" />
     <Compile Include="RoundButton.xaml.cs">
       <DependentUpon>RoundButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Test.xaml.cs">
+      <DependentUpon>Test.xaml</DependentUpon>
     </Compile>
     <Compile Include="TileBlock.xaml.cs">
       <DependentUpon>TileBlock.xaml</DependentUpon>
@@ -77,6 +84,10 @@
     <Compile Include="Utils.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="World.cs" />
+    <Page Include="GenerationButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GenerationSpeciesHistory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -102,6 +113,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RoundButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
