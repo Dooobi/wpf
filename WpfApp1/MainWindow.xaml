@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="800"
+        Title="MainWindow" Height="Auto" Width="Auto"
         Background="#222222"
         x:Name="selfMainWindow">
 
@@ -43,6 +43,6 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <local:Genotype DataContext="{Binding SelectedGenome}"/>
+        <local:Genotype DataContext="{Binding GenotypeViewModel}"/>
     </StackPanel>
 </Window>

@@ -12,7 +12,7 @@
         <StackPanel Orientation="Vertical" Height="Auto">
 
             <!-- Genome Id-->
-            <TextBlock Text="Genome 'ABC'" FontSize="24" FontWeight="Bold" TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Top" Foreground="White"/>
+            <TextBlock Text="{Binding Genome.Id, StringFormat='Genome {0}'}" FontSize="24" FontWeight="Bold" TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Top" Foreground="White"/>
 
             <!-- Properties -->
             <Grid Height="Auto">
@@ -32,16 +32,23 @@
                 <TextBlock Grid.Column="0" Grid.Row="2" Text="Generation:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White"/>
                 <TextBlock Grid.Column="0" Grid.Row="3" Text="Species:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White"/>
 
-                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Fitness}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
-                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding AdjustedFitness}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
-                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Generation.Number}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
-                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Species.Id}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Genome.Fitness}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding Genome.AdjustedFitness}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Genome.Generation.Number}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Genome.Species.Id}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
             </Grid>
 
             <!-- NeuronGenes -->
-            <TextBlock Text="NeuronGenes:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" Foreground="White" Margin="0,10,0,0"/>
+            <TextBlock FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" Foreground="White" Margin="0,10,0,0">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="NeuronGenes ({1} Hidden):">
+                        <Binding Path="Genome.NeuronGenes.Count"/>
+                        <Binding Path="CountHiddenNeuronGenes"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
             <ScrollViewer HorizontalAlignment="Left" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Hidden" Height="Auto">
-                <ItemsControl ItemsSource="{Binding NeuronGenes}" Margin="0,5,0,5">
+                <ItemsControl ItemsSource="{Binding SortedNeuronGenes}" Margin="0,5,0,5">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal"/>
@@ -72,7 +79,7 @@
             <!-- ConnectionGenes -->
             <TextBlock Text="ConnectionGenes:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" Foreground="White" Margin="0,10,0,0"/>
             <ScrollViewer HorizontalAlignment="Left" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Hidden" Height="Auto">
-                <ItemsControl ItemsSource="{Binding ConnectionGenes}" Margin="0,5,0,5">
+                <ItemsControl ItemsSource="{Binding Genome.ConnectionGenes}" Margin="0,5,0,5">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel Orientation="Horizontal"/>
@@ -84,7 +91,7 @@
                             <Border Width="90" Height="90" BorderThickness="2,2,2,2" BorderBrush="White" Background="#333333" Padding="0,0,4,0">
                                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="55"/>
+                                        <ColumnDefinition Width="50"/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>

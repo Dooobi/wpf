@@ -31,33 +31,30 @@ namespace WpfApp1
                             SpeciesTimestamp selectedSpeciesTimestamp = parameter as SpeciesTimestamp;
                             if (selectedSpeciesTimestamp != null)
                             {
-                                SelectedGenome = selectedSpeciesTimestamp.FittestGenome;
+                                GenotypeViewModel = new GenotypeViewModel(selectedSpeciesTimestamp.FittestGenome);
                             }                                
                         });
                 }
                 return _showFittestGenomeOfSpeciesTimestamp;
             }
         }
-
-        public List<string> MyStrings { get; set; }
-        public List<Generation> MyCollection { get; set; }
+        
         public History History { get; set; }
 
         private List<List<double>> inputPatterns;
         private List<double> answers;
 
-        private Genome selectedGenome;
-        public Genome SelectedGenome
-        {
+        private GenotypeViewModel genotypeViewModel;
+        public GenotypeViewModel GenotypeViewModel {
             get
             {
-                return selectedGenome;
+                return genotypeViewModel;
             }
             set
             {
-                if (value != this.selectedGenome)
+                if (value != genotypeViewModel)
                 {
-                    this.selectedGenome = value;
+                    genotypeViewModel = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -68,17 +65,6 @@ namespace WpfApp1
             Initialize();
 
             History = History.Singleton;
-            History.Test = "test";
-
-            MyCollection = new List<Generation>(new Generation[] {
-                new Generation(1),
-                new Generation(2),
-                new Generation(3),
-                new Generation(4),
-                new Generation(5)
-            });
-
-            MyStrings = new List<string>(new string[] { "a", "b", "c", "d" });
 
             TestGeneticAlgorithm();
         }
@@ -151,10 +137,7 @@ namespace WpfApp1
         // NotifyPropertyChanged
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

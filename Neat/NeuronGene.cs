@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neat
 {
-    public class NeuronGene
+    public class NeuronGene : IComparable<NeuronGene>
     {
         public string Id { get; set; }
 
@@ -41,6 +41,17 @@ namespace Neat
             json.Add("Type", Type.ToString());
 
             return json;
+        }
+
+        public int CompareTo(NeuronGene other)
+        {
+            if (Type == other.Type)
+            {
+                return Id.CompareTo(other.Id);
+            }
+
+            List<NeuronType> typeOrder = new List<NeuronType> { NeuronType.Input, NeuronType.Bias, NeuronType.Hidden, NeuronType.Output, NeuronType.None };
+            return Math.Sign(typeOrder.IndexOf(Type) - typeOrder.IndexOf(other.Type));
         }
     }
 }
