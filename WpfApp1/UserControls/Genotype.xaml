@@ -1,0 +1,114 @@
+﻿<UserControl x:Class="WpfApp1.Genotype"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp1"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             x:Name="selfGenotype">
+
+    <Border BorderThickness="1,1,1,1" BorderBrush="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,10,10" Padding="10,10,10,10" Width="800" Height="400">
+        <StackPanel Orientation="Vertical" Height="Auto">
+
+            <!-- Genome Id-->
+            <TextBlock Text="Genome 'ABC'" FontSize="24" FontWeight="Bold" TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Top" Foreground="White"/>
+
+            <!-- Properties -->
+            <Grid Height="Auto">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Column="0" Grid.Row="0" Text="Fitness:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White"/>
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="Adjusted Fitness:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White"/>
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="Generation:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White"/>
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="Species:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White"/>
+
+                <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Fitness}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding AdjustedFitness}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
+                <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Generation.Number}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
+                <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding Species.Id}" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" Margin="20,0,0,0"/>
+            </Grid>
+
+            <!-- NeuronGenes -->
+            <TextBlock Text="NeuronGenes:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" Foreground="White" Margin="0,10,0,0"/>
+            <ScrollViewer HorizontalAlignment="Left" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Hidden" Height="Auto">
+                <ItemsControl ItemsSource="{Binding NeuronGenes}" Margin="0,5,0,5">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="60" Height="60" BorderThickness="2,2,2,2" BorderBrush="White" Background="#333333">
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding Id}" TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Grid.Column="0" Grid.Row="1" Text="{Binding Type}" TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- ConnectionGenes -->
+            <TextBlock Text="ConnectionGenes:" FontSize="18" TextAlignment="Left" HorizontalAlignment="Stretch" Foreground="White" Margin="0,10,0,0"/>
+            <ScrollViewer HorizontalAlignment="Left" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Hidden" Height="Auto">
+                <ItemsControl ItemsSource="{Binding ConnectionGenes}" Margin="0,5,0,5">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="90" Height="90" BorderThickness="2,2,2,2" BorderBrush="White" Background="#333333" Padding="0,0,4,0">
+                                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="55"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Column="0" Grid.Row="0" Text="From" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" Margin="2,0,0,0"/>
+                                    <TextBlock Grid.Column="0" Grid.Row="1" Text="To" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" Margin="2,0,0,0"/>
+                                    <TextBlock Grid.Column="0" Grid.Row="2" Text="Weight" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" Margin="2,0,0,0"/>
+                                    <TextBlock Grid.Column="0" Grid.Row="3" Text="Innov" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White" Margin="2,0,0,0"/>
+
+                                    <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding NeuronGeneFrom.Id}" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding NeuronGeneFrom.Id}" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding Weight, StringFormat=0.00}" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding InnovationNumber}" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </StackPanel>
+    </Border>
+</UserControl>

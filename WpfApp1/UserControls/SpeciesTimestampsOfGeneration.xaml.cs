@@ -32,5 +32,14 @@ namespace WpfApp1
         }
         public static readonly DependencyProperty DiameterProperty =
             DependencyProperty.Register("Diameter", typeof(double), typeof(SpeciesTimestampsOfGeneration), new PropertyMetadata());
+
+        public ICommand OnSpeciesTimestampClicked
+        {
+            get { return (ICommand)GetValue(OnSpeciesTimestampClickedProperty); }
+            set { SetValue(OnSpeciesTimestampClickedProperty, value); }
+        }
+        public static readonly DependencyProperty OnSpeciesTimestampClickedProperty =
+            DependencyProperty.Register("OnSpeciesTimestampClicked", typeof(ICommand), typeof(SpeciesTimestampsOfGeneration), new PropertyMetadata());
+
     }
 }

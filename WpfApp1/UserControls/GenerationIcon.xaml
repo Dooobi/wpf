@@ -29,7 +29,7 @@
             <Grid>
                 <Ellipse Fill="CornflowerBlue" Width="{Binding ElementName=selfGenerationIcon, Path=Diameter}" Height="{Binding ElementName=selfGenerationIcon, Path=Diameter}"/>
                 <Viewbox Margin="10">
-                    <TextBlock VerticalAlignment="Center" Text="{Binding Number}" Foreground="{Binding ElementName=selfGenerationIcon, Path=Foreground}" FontSize="{Binding ElementName=selfGenerationIcon, Path=FontSize}" TextAlignment="Center"/>
+                    <TextBlock VerticalAlignment="Center" Text="{Binding Number}" Foreground="{Binding ElementName=selfGenerationIcon, Path=Foreground}" TextAlignment="Center"/>
                 </Viewbox>
             </Grid>
         </Viewbox>

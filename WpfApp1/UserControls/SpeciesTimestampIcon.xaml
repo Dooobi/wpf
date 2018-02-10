@@ -43,11 +43,14 @@
         </Grid.ToolTip>
         <Viewbox Margin="2">
             <Grid>
+                <Grid.InputBindings>
+                    <MouseBinding Gesture="LeftClick" Command="{Binding ElementName=selfSpeciesTimestampIcon, Path=OnSpeciesTimestampClicked}" CommandParameter="{Binding}"/>
+                </Grid.InputBindings>
                 <Ellipse Fill="{Binding AverageFitness, Mode=OneWay, Converter={local:FitnessToColorConverter}, ConverterParameter='0,0;16,0'}" 
                          Width="{Binding ElementName=selfSpeciesTimestampIcon, Path=Diameter}" 
                          Height="{Binding ElementName=selfSpeciesTimestampIcon, Path=Diameter}"/>
                 <Viewbox Margin="10">
-                    <TextBlock VerticalAlignment="Center" Text="{Binding Species.Id}" Foreground="{Binding ElementName=selfSpeciesTimestampIcon, Path=Foreground}" FontSize="{Binding ElementName=selfSpeciesTimestampIcon, Path=FontSize}" TextAlignment="Center"/>
+                    <TextBlock VerticalAlignment="Center" Text="{Binding Species.Id}" Foreground="{Binding ElementName=selfSpeciesTimestampIcon, Path=Foreground}" TextAlignment="Center"/>
                 </Viewbox>
             </Grid>
         </Viewbox>

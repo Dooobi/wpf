@@ -49,15 +49,6 @@ namespace WpfApp1
         public static readonly DependencyProperty DiameterProperty =
             DependencyProperty.Register("Diameter", typeof(double), typeof(GenerationIcon), new PropertyMetadata());
 
-        public double TextSize
-        {
-            get { return (double)GetValue(FontSizeProperty); }
-            set { SetValue(FontSizeProperty, value); }
-        }
-        public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register("FontSize", typeof(double), typeof(GenerationIcon), new PropertyMetadata());
-
-
         public event MouseButtonEventHandler GenerationIconMouseDown;
         private void GenerationIcon_MouseDown(object sender, MouseButtonEventArgs e)
         {

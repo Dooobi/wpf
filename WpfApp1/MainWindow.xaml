@@ -5,25 +5,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="525"
-        Background="#222222">
+        Title="MainWindow" Height="800" Width="800"
+        Background="#222222"
+        x:Name="selfMainWindow">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="MyResources.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
 
-    <!--<Window.DataContext>
-        <local:ViewModel/>
-    </Window.DataContext>-->
+    <StackPanel Orientation="Horizontal">
+        <ScrollViewer>
+            <ItemsControl Name="itemsControl" ItemsSource="{Binding History.Generations}">
+                <!-- ItemsPanelItem -->
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
 
-    <!--<DataGrid ItemsSource="{Binding Speciess}" FrozenColumnCount="1" AutoGenerateColumns="True" IsReadOnly="True">
-        <DataGrid.Columns>
-            <DataGridTextColumn Header="Number" Binding="{Binding Key.Number}"/>
-            <DataGridTextColumn Header="Species 1" Binding="{Binding Value[0].Id}"/>
-        </DataGrid.Columns>
-    </DataGrid>-->
+                <!-- ItemTemplate -->
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+
+                        <!-- Row for the Generation -->
+                        <StackPanel Name="generationRow" Orientation="Horizontal">
+                            <!-- Generation Icon -->
+                            <local:GenerationIcon Diameter="40" Foreground="Black"/>
+
+                            <!-- Separator -->
+                            <StackPanel Width="20"/>
+
+                            <local:SpeciesTimestampsOfGeneration Diameter="40" OnSpeciesTimestampClicked="{Binding ElementName=selfMainWindow, Path=DataContext.ShowFittestGenomeOfSpeciesTimestamp}"/>
+
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <local:Genotype DataContext="{Binding SelectedGenome}"/>
+    </StackPanel>
 </Window>

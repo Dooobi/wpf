@@ -49,15 +49,14 @@ namespace WpfApp1
         public static readonly DependencyProperty DiameterProperty =
             DependencyProperty.Register("Diameter", typeof(double), typeof(SpeciesTimestampIcon), new PropertyMetadata());
 
-        public double TextSize
+        public ICommand OnSpeciesTimestampClicked
         {
-            get { return (double)GetValue(FontSizeProperty); }
-            set { SetValue(FontSizeProperty, value); }
+            get { return (ICommand)GetValue(OnSpeciesTimestampClickedProperty); }
+            set { SetValue(OnSpeciesTimestampClickedProperty, value); }
         }
-        public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register("FontSize", typeof(double), typeof(SpeciesTimestampIcon), new PropertyMetadata());
-
-
+        public static readonly DependencyProperty OnSpeciesTimestampClickedProperty =
+            DependencyProperty.Register("OnSpeciesTimestampClicked", typeof(ICommand), typeof(SpeciesTimestampIcon), new PropertyMetadata());
+        
         public event MouseButtonEventHandler SpeciesTimestampIconMouseDown;
         private void SpeciesTimestampIcon_MouseDown(object sender, MouseButtonEventArgs e)
         {

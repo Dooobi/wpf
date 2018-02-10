@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WpfApp1"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             x:Name="selfSpeciesTimestampOfGeneration">
+             x:Name="selfSpeciesTimestampsOfGeneration">
 
     <!-- SpeciesTimestamp Icons -->
     <ItemsControl ItemsSource="{Binding SpeciesTimestamps}">
@@ -18,7 +18,7 @@
 
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <local:SpeciesTimestampIcon Diameter="{Binding ElementName=selfSpeciesTimestampOfGeneration, Path=Diameter}" Foreground="Black"/>
+                <local:SpeciesTimestampIcon Diameter="{Binding ElementName=selfSpeciesTimestampsOfGeneration, Path=Diameter}" OnSpeciesTimestampClicked="{Binding ElementName=selfSpeciesTimestampsOfGeneration, Path=OnSpeciesTimestampClicked}" Foreground="Black"/>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>

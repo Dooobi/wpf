@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaktionslogik für GenerationSpeciesHistory.xaml
+    /// Interaktionslogik für Genotype.xaml
     /// </summary>
-    public partial class GenerationSpeciesHistory : UserControl
+    public partial class Genotype : UserControl
     {
-        public GenerationSpeciesHistory()
+        public Genotype()
         {
             InitializeComponent();
         }

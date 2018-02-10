@@ -2,26 +2,43 @@
 using NeuralNetwork;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WpfApp1
 {
-    /// <summary>
-    /// Interaktionslogik für Test.xaml
-    /// </summary>
-    public partial class Test : UserControl
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private ICommand _showFittestGenomeOfSpeciesTimestamp;
+        public ICommand ShowFittestGenomeOfSpeciesTimestamp
+        {
+            get
+            {
+                if (_showFittestGenomeOfSpeciesTimestamp == null)
+                {
+                    _showFittestGenomeOfSpeciesTimestamp = new RelayCommand(
+                        parameter => true,
+                        parameter =>
+                        {
+                            SpeciesTimestamp selectedSpeciesTimestamp = parameter as SpeciesTimestamp;
+                            if (selectedSpeciesTimestamp != null)
+                            {
+                                SelectedGenome = selectedSpeciesTimestamp.FittestGenome;
+                            }                                
+                        });
+                }
+                return _showFittestGenomeOfSpeciesTimestamp;
+            }
+        }
+
         public List<string> MyStrings { get; set; }
         public List<Generation> MyCollection { get; set; }
         public History History { get; set; }
@@ -29,17 +46,29 @@ namespace WpfApp1
         private List<List<double>> inputPatterns;
         private List<double> answers;
 
-        public Test()
+        private Genome selectedGenome;
+        public Genome SelectedGenome
         {
-            InitializeComponent();
+            get
+            {
+                return selectedGenome;
+            }
+            set
+            {
+                if (value != this.selectedGenome)
+                {
+                    this.selectedGenome = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public MainWindowViewModel()
+        {
             Initialize();
 
-            // Make tooltips stay forever
-            ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject), new FrameworkPropertyMetadata(Int32.MaxValue));
-
-            itemsControl.DataContext = this;
-
             History = History.Singleton;
+            History.Test = "test";
 
             MyCollection = new List<Generation>(new Generation[] {
                 new Generation(1),
@@ -85,12 +114,6 @@ namespace WpfApp1
                         {
                             Console.WriteLine(" {0}: {1}", speciesTimestamp.Species.Id, speciesTimestamp.AverageFitness);
                         }
-
-                        Dispatcher.Invoke(() =>
-                        {
-                            //Dein Code der synchronisiert zur GUI läuft
-                            //UpdateGrid();
-                        });
                     }
                     if (currentGeneration == null)
                     {
@@ -107,11 +130,6 @@ namespace WpfApp1
 
                 nextGeneration = neatController.SubmitGenomeAfterEvaluation(genome);
             }
-            Dispatcher.Invoke(() =>
-            {
-                //Dein Code der synchronisiert zur GUI läuft
-                //UpdateGrid();
-            });
 
             //Console.WriteLine("  highestCompatibilityValue: {0}", Stats.highestCompatibilityValue);
         }
@@ -128,6 +146,15 @@ namespace WpfApp1
                 totalErrorDiff += Math.Abs(output[0] - answer);
             }
             return Math.Pow(4.0 - totalErrorDiff, 2);
+        }
+
+        // NotifyPropertyChanged
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }
