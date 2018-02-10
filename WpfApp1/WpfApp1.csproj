@@ -61,6 +61,9 @@
     </ApplicationDefinition>
     <Compile Include="Converters\BaseConverter.cs" />
     <Compile Include="Converters\FitnessToColorConverter.cs" />
+    <Compile Include="PlayGround.xaml.cs">
+      <DependentUpon>PlayGround.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\GenotypeViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="RelayCommand.cs" />
@@ -80,6 +83,10 @@
       <DependentUpon>TileBlock.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
+    <Page Include="PlayGround.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\Genotype.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -16,6 +16,16 @@ namespace WpfApp1
         
         public Genome Genome { get; set; }
 
+        public List<ConnectionGene> EnabledConnectionGenes
+        {
+            get
+            {
+                List<ConnectionGene> enabledConnectionGenes = new List<ConnectionGene>(Genome.ConnectionGenes);
+                enabledConnectionGenes.RemoveAll(connectionGene => !connectionGene.IsEnabled);
+                return enabledConnectionGenes;
+            }
+        }
+
         public List<NeuronGene> SortedNeuronGenes {
             get
             {

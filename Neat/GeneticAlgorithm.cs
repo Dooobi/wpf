@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Neat
 {
@@ -566,7 +564,7 @@ namespace Neat
                     else
                     {
                         // Perturb this Connection weight
-                        connectionGene.Weight += Utils.random.NextDouble() * Config.maxWeightPerturbation;
+                        connectionGene.Weight += Utils.RandDouble(-1.0, 1.0) * Config.maxWeightPerturbation;
                         // Don't overshoot the limits
                         connectionGene.Weight = Math.Max(connectionGene.Weight, Config.minWeightLimit);
                         connectionGene.Weight = Math.Min(connectionGene.Weight, Config.maxWeightLimit);
@@ -699,10 +697,10 @@ namespace Neat
                 {
                     connectionGeneChild.IsEnabled = false;
                 }
-                else
-                {
-                    connectionGeneChild.IsEnabled = true;
-                }
+                //else
+                //{
+                //    connectionGeneChild.IsEnabled = true;
+                //}
             }
             // These will be overwritten with the corresponding NeuronGene of
             // the child Genome later on

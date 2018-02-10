@@ -88,7 +88,7 @@ namespace WpfApp1
             NeatController neatController = new NeatController();
             Generation currentGeneration = History.CurrentGeneration;
             bool nextGeneration = true;
-            while (currentGeneration == null || currentGeneration.Number < 100)
+            while (currentGeneration == null || currentGeneration.Number < 1000)
             {
                 currentGeneration = History.CurrentGeneration;
 
