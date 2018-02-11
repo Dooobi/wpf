@@ -10,3 +10,4 @@ https://cogsci.stackexchange.com/questions/17005/what-role-do-circular-network-s
 
 WPF:<br>
 https://social.technet.microsoft.com/wiki/contents/articles/30898.simple-navigation-technique-in-wpf-using-mvvm.aspx<br>
+http://www.nbdtech.com/Free/WpfBinding.pdf<br>
